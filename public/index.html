@@ -1,0 +1,3360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TrackEdu — Student Attendance Management System</title>
+  <!-- Google Fonts & Material Symbols -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0..1,0" />
+
+  <style>
+    :root {
+      --primary: #1E3A8A;
+      --on-primary: #FFFFFF;
+      --primary-container: #2563EB;
+      --on-primary-container: #DBEAFE;
+      --secondary: #0D9488;
+      --on-secondary: #FFFFFF;
+      --secondary-container: #CCFBF1;
+      --on-secondary-container: #115E59;
+      --tertiary: #2563EB;
+      --background: #F8FAFC;
+      --on-background: #0F172A;
+      --surface: #FFFFFF;
+      --on-surface: #0F172A;
+      --surface-variant: #F1F5F9;
+      --on-surface-variant: #475569;
+      --surface-lowest: #FFFFFF;
+      --surface-low: #F8FAFC;
+      --surface-card: #FFFFFF;
+      --surface-container: #F1F5F9;
+      --surface-high: #E2E8F0;
+      --outline: #64748B;
+      --outline-variant: #CBD5E1;
+
+      --present-green: #16A34A;
+      --present-bg: #DCFCE7;
+      --present-text: #14532D;
+
+      --absent-red: #DC2626;
+      --absent-bg: #FFDAD6;
+      --absent-text: #93000A;
+
+      --warning-amber: #D97706;
+      --warning-bg: #FEF3C7;
+      --warning-text: #92400E;
+
+      --shadow-sm: 0 1px 3px rgba(30, 58, 138, 0.05);
+      --shadow-md: 0 4px 12px rgba(30, 58, 138, 0.07);
+      --shadow-lg: 0 12px 28px rgba(30, 58, 138, 0.10);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background: #F1F5F9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      color: #0F172A;
+    }
+
+    /* Top Evaluation Control Header */
+    .preview-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 440px;
+      margin-bottom: 12px;
+      padding: 4px 8px;
+    }
+    .preview-title-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      color: #1E3A8A;
+    }
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2563EB;
+      box-shadow: 0 0 10px rgba(37, 99, 235, 0.5);
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(1.2); }
+    }
+    .role-toggle-bar {
+      display: flex;
+      gap: 6px;
+      background: #E2E8F0;
+      padding: 3px;
+      border-radius: 20px;
+      border: 1px solid #CBD5E1;
+    }
+    .role-pill-btn {
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #475569;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-pill-btn.active {
+      background: #2563EB;
+      color: #FFFFFF;
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Phone Shell */
+    .phone-container {
+      width: 100%;
+      max-width: 420px;
+      height: 860px;
+      background: var(--background);
+      border-radius: 44px;
+      border: 10px solid #0F172A;
+      box-shadow: 0 25px 60px -15px rgba(15, 23, 42, 0.25), 0 0 0 1px rgba(0, 0, 0, 0.08);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      color: var(--on-background);
+    }
+    .phone-container.fullscreen-mode {
+      max-width: 100%;
+      height: 100vh;
+      border-radius: 0;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Android Status Bar */
+    .android-status-bar {
+      height: 36px;
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--on-background);
+      z-index: 50;
+      background: var(--background);
+    }
+    .status-camera-notch {
+      width: 10px;
+      height: 10px;
+      background: #0F172A;
+      border-radius: 50%;
+    }
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    /* Top App Bar */
+    .app-top-bar {
+      background: var(--surface);
+      padding: 8px 18px 12px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--surface-container);
+      z-index: 40;
+    }
+    .app-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .app-logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-container));
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 10px rgba(0, 35, 111, 0.2);
+    }
+    .app-brand-text h1 {
+      font-size: 17px;
+      font-weight: 800;
+      color: var(--primary);
+      line-height: 1.1;
+      letter-spacing: -0.3px;
+    }
+    .app-brand-text p {
+      font-size: 11px;
+      color: var(--on-surface-variant);
+      font-weight: 600;
+    }
+    .top-bar-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .icon-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: var(--surface-low);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+    }
+    .icon-btn:hover {
+      background: var(--surface-high);
+    }
+    .badge-count {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      min-width: 16px;
+      height: 16px;
+      background: var(--absent-red);
+      color: white;
+      border-radius: 8px;
+      font-size: 9px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px;
+      border: 1.5px solid white;
+    }
+    .avatar-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      font-size: 12px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+    }
+
+    /* Screen Content Area */
+    .screen-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      background: var(--background);
+      scroll-behavior: smooth;
+    }
+    .screen-content::-webkit-scrollbar {
+      width: 4px;
+    }
+    .screen-content::-webkit-scrollbar-thumb {
+      background: var(--surface-variant);
+      border-radius: 4px;
+    }
+
+    /* Bottom Navigation Bar */
+    .app-bottom-bar {
+      height: 64px;
+      background: var(--surface-lowest);
+      border-top: 1px solid var(--surface-container);
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 4px 6px 4px;
+      z-index: 40;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--on-surface-variant);
+      font-size: 10px;
+      font-weight: 600;
+      flex: 1;
+      padding: 6px 0;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .nav-item.active {
+      color: var(--primary);
+    }
+    .nav-item.active .nav-icon-wrapper {
+      background: var(--surface-variant);
+      color: var(--primary);
+    }
+    .nav-icon-wrapper {
+      width: 44px;
+      height: 26px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+    .nav-icon-wrapper .material-symbols-rounded {
+      font-size: 20px;
+    }
+
+    /* Cards & Containers */
+    .card {
+      background: var(--surface-card);
+      border-radius: 18px;
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(218, 226, 253, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Typography Utilities */
+    .section-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--on-surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .section-subtitle {
+      font-size: 12px;
+      color: var(--on-surface-variant);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+    .btn-primary {
+      background: var(--primary);
+      color: var(--on-primary);
+      box-shadow: 0 4px 14px rgba(0, 35, 111, 0.25);
+    }
+    .btn-primary:hover {
+      background: #001A54;
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: var(--surface-high);
+      color: var(--primary);
+    }
+    .btn-secondary:hover {
+      background: var(--surface-variant);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--outline-variant);
+      color: var(--on-surface);
+    }
+    .btn-danger {
+      background: var(--absent-bg);
+      color: var(--absent-text);
+      border: 1px solid rgba(220, 38, 38, 0.2);
+    }
+    .btn-teal {
+      background: var(--secondary-container);
+      color: var(--secondary);
+    }
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 11px;
+      border-radius: 9px;
+    }
+
+    /* Status Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-excellent { background: var(--present-bg); color: var(--present-text); }
+    .badge-good { background: #E0F2FE; color: #0369A1; }
+    .badge-warning { background: var(--warning-bg); color: var(--warning-text); }
+    .badge-critical { background: var(--absent-bg); color: var(--absent-text); }
+    .badge-special { background: var(--secondary-container); color: var(--secondary); }
+    .badge-pending { background: var(--warning-bg); color: var(--warning-text); }
+
+    /* Donut Progress Ring */
+    .donut-wrapper {
+      position: relative;
+      width: 86px;
+      height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .donut-svg {
+      transform: rotate(-90deg);
+      width: 100%;
+      height: 100%;
+    }
+    .donut-circle-bg {
+      fill: none;
+      stroke: var(--surface-high);
+      stroke-width: 8;
+    }
+    .donut-circle-val {
+      fill: none;
+      stroke: var(--primary);
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 0.8s ease;
+    }
+    .donut-label {
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+    .donut-label .pct {
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .donut-label .sub {
+      font-size: 8px;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      margin-top: 2px;
+    }
+
+    /* Quick Operations Grid */
+    .quick-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .quick-card {
+      background: var(--surface-card);
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid var(--surface-container);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .quick-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .quick-icon-box {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-bottom: 2px;
+    }
+    .quick-card h4 {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--on-surface);
+    }
+    .quick-card p {
+      font-size: 11px;
+      color: var(--on-surface-variant);
+      line-height: 1.2;
+    }
+
+    /* Weekly Bar Chart */
+    .chart-container {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 120px;
+      padding-top: 10px;
+    }
+    .chart-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      height: 100%;
+      justify-content: flex-end;
+      gap: 4px;
+    }
+    .chart-val {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+    }
+    .chart-bar {
+      width: 20px;
+      border-radius: 6px 6px 0 0;
+      background: var(--primary-container);
+      transition: height 0.6s ease;
+    }
+    .chart-bar.highlight {
+      background: var(--present-green);
+    }
+    .chart-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      margin-top: 2px;
+    }
+
+    /* Shortage Item */
+    .risk-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px;
+      background: var(--surface-low);
+      border-radius: 14px;
+      border-left: 4px solid var(--absent-red);
+      margin-bottom: 8px;
+      transition: background 0.15s;
+    }
+    .risk-item:hover {
+      background: var(--surface-high);
+    }
+
+    /* Search & Filter Bar */
+    .search-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface-card);
+      padding: 10px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--surface-container);
+      box-shadow: var(--shadow-sm);
+    }
+    .search-box input {
+      border: none;
+      outline: none;
+      background: transparent;
+      width: 100%;
+      font-size: 13px;
+      color: var(--on-surface);
+    }
+    .filter-chips {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+    .filter-chips::-webkit-scrollbar {
+      display: none;
+    }
+    .chip {
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--surface-card);
+      border: 1px solid var(--surface-container);
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .chip.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* Student Card */
+    .student-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--surface-card);
+      border-radius: 16px;
+      border: 1px solid var(--surface-container);
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .student-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: var(--surface-variant);
+    }
+    .student-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .student-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      background: var(--primary-container);
+      color: white;
+      font-weight: 800;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .student-meta h4 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--on-surface);
+    }
+    .student-meta p {
+      font-size: 11px;
+      color: var(--on-surface-variant);
+      font-weight: 500;
+    }
+
+    /* Attendance Marking Item */
+    .mark-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      background: var(--surface-card);
+      border-radius: 14px;
+      border: 1px solid var(--surface-container);
+      margin-bottom: 8px;
+    }
+    .toggle-attendance-group {
+      display: flex;
+      background: var(--surface-low);
+      border-radius: 10px;
+      padding: 2px;
+      gap: 2px;
+    }
+    .toggle-att-btn {
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: none;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s;
+    }
+    .toggle-att-btn.present.active {
+      background: var(--present-green);
+      color: white;
+      box-shadow: 0 2px 6px rgba(22, 163, 74, 0.3);
+    }
+    .toggle-att-btn.absent.active {
+      background: var(--absent-red);
+      color: white;
+      box-shadow: 0 2px 6px rgba(220, 38, 38, 0.3);
+    }
+    .toggle-att-btn:not(.active) {
+      background: transparent;
+      color: var(--on-surface-variant);
+      opacity: 0.6;
+    }
+
+    /* Floating Action Button */
+    .fab-btn {
+      position: absolute;
+      bottom: 78px;
+      right: 18px;
+      width: 54px;
+      height: 54px;
+      border-radius: 18px;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 20px rgba(0, 35, 111, 0.35);
+      border: none;
+      cursor: pointer;
+      z-index: 30;
+      transition: transform 0.2s;
+    }
+    .fab-btn:hover {
+      transform: scale(1.06);
+    }
+
+    /* Form Styles */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      margin-bottom: 12px;
+    }
+    .form-group label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--on-surface);
+    }
+    .form-control {
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1.5px solid var(--outline-variant);
+      background: var(--surface-card);
+      font-size: 13px;
+      color: var(--on-surface);
+      outline: none;
+      transition: border 0.2s;
+    }
+    .form-control:focus {
+      border-color: var(--primary);
+    }
+    select.form-control {
+      cursor: pointer;
+    }
+
+    /* Toast Snackbar */
+    .toast-snackbar {
+      position: absolute;
+      bottom: 74px;
+      left: 16px;
+      right: 16px;
+      background: #1E293B;
+      color: white;
+      padding: 10px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      box-shadow: var(--shadow-lg);
+      z-index: 100;
+      animation: slideUp 0.3s ease;
+      display: none;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* Modal dialog */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(3px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 90;
+    }
+    /* Motion Splash Screen Styles */
+    .splash-container {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 50%, #EFF6FF 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 24px;
+      z-index: 80;
+      color: #0F172A;
+      text-align: center;
+    }
+    .splash-logo-box {
+      width: 90px;
+      height: 90px;
+      border-radius: 26px;
+      background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 12px 32px rgba(37, 99, 235, 0.35);
+      margin-bottom: 24px;
+      animation: splashLogoMotion 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes splashLogoMotion {
+      0% { opacity: 0; transform: scale(0.5); }
+      70% { opacity: 1; transform: scale(1.08); }
+      100% { opacity: 1; transform: scale(1.0); }
+    }
+    .splash-title {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #1E3A8A;
+      margin-bottom: 6px;
+      animation: splashFadeIn 0.8s ease 0.3s forwards;
+      opacity: 0;
+    }
+    .splash-subtitle {
+      font-size: 15px;
+      font-weight: 600;
+      color: #0D9488;
+      margin-bottom: 12px;
+      animation: splashFadeIn 0.8s ease 0.5s forwards;
+      opacity: 0;
+    }
+    .splash-tagline {
+      font-size: 13px;
+      color: #64748B;
+      max-width: 260px;
+      line-height: 1.4;
+      animation: splashFadeIn 0.8s ease 0.7s forwards;
+      opacity: 0;
+    }
+    .splash-pulse-dots {
+      display: flex;
+      gap: 8px;
+      margin-top: 36px;
+      animation: splashFadeIn 0.8s ease 0.9s forwards;
+      opacity: 0;
+    }
+    .splash-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2563EB;
+      animation: dotPulse 1.2s infinite ease-in-out;
+    }
+    .splash-dot:nth-child(2) {
+      background: #38BDF8;
+      animation-delay: 0.2s;
+    }
+    .splash-dot:nth-child(3) {
+      background: #14B8A6;
+      animation-delay: 0.4s;
+    }
+    @keyframes splashFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes dotPulse {
+      0%, 100% { transform: scale(0.8); opacity: 0.5; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+    .splash-version-footer {
+      position: absolute;
+      bottom: 24px;
+      font-size: 11px;
+      color: #94A3B8;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    /* Landing / Login Screen Styles */
+    .login-container {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 14px 4px 30px 4px;
+    }
+    .login-brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 6px;
+      margin-top: 8px;
+      margin-bottom: 2px;
+    }
+    .login-logo {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #1E3A8A, #2563EB);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 8px 20px rgba(30, 58, 138, 0.25);
+      margin-bottom: 4px;
+    }
+    .role-selector-box {
+      background: var(--surface-card);
+      border-radius: 16px;
+      padding: 14px;
+      border: 1px solid rgba(218, 226, 253, 0.5);
+      box-shadow: var(--shadow-sm);
+    }
+    .role-selector-pills {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .role-select-pill {
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid transparent;
+      background: var(--surface-low);
+      color: var(--on-surface-variant);
+      font-size: 13px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .role-select-pill.active {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 35, 111, 0.25);
+    }
+    .role-select-pill:hover:not(.active) {
+      background: var(--surface-high);
+    }
+    .login-card {
+      background: var(--surface-card);
+      border-radius: 20px;
+      padding: 20px 18px;
+      border: 1px solid rgba(218, 226, 253, 0.5);
+      box-shadow: var(--shadow-md);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .input-icon-lead {
+      position: absolute;
+      left: 12px;
+      color: var(--primary);
+      font-size: 20px;
+      pointer-events: none;
+    }
+    .input-with-icon {
+      padding-left: 40px !important;
+      padding-right: 40px !important;
+    }
+    .input-eye-btn {
+      position: absolute;
+      right: 10px;
+      background: none;
+      border: none;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 4px;
+    }
+    .error-banner {
+      background: #FFDAD6;
+      color: #93000A;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 8px;
+    }
+    .spinner-icon {
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+    .quick-creds-card {
+      background: var(--surface-low);
+      border-radius: 14px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px dashed var(--outline-variant);
+    }
+    .android-nav-bar {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 48px;
+      color: var(--outline);
+      background: var(--surface-lowest);
+      border-top: 1px solid rgba(0,0,0,0.05);
+      user-select: none;
+    }
+    .android-nav-btn {
+      cursor: pointer;
+      opacity: 0.7;
+      transition: opacity 0.2s;
+    }
+    .android-nav-btn:hover {
+      opacity: 1;
+      color: var(--primary);
+    }
+  
+    /* Dark Theme Scheme */
+    [data-theme="dark"], body.dark-mode {
+      --primary: #3B82F6;
+      --on-primary: #FFFFFF;
+      --primary-container: #1D4ED8;
+      --on-primary-container: #EFF6FF;
+      --secondary: #14B8A6;
+      --on-secondary: #042F2E;
+      --secondary-container: #0F766E;
+      --on-secondary-container: #CCFBF1;
+      --tertiary: #60A5FA;
+      --background: #0B1120;
+      --on-background: #F1F5F9;
+      --surface: #1E293B;
+      --on-surface: #F8FAFC;
+      --surface-variant: #334155;
+      --on-surface-variant: #94A3B8;
+      --surface-lowest: #0B1120;
+      --surface-low: #1E293B;
+      --surface-card: #1E293B;
+      --surface-container: #334155;
+      --surface-high: #475569;
+      --outline: #64748B;
+      --outline-variant: #475569;
+      --present-green: #22C55E;
+      --present-bg: #064E3B;
+      --present-text: #A7F3D0;
+      --absent-red: #EF4444;
+      --absent-bg: #7F1D1D;
+      --absent-text: #FECACA;
+      --warning-amber: #F59E0B;
+      --warning-bg: #78350F;
+      --warning-text: #FDE68A;
+      --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.5);
+      --shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.6);
+    }
+    body.dark-mode {
+      background: #060913;
+      color: #F1F5F9;
+    }
+
+    /* Navigation Drawer */
+    .drawer-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(2px);
+      z-index: 120;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .drawer-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .drawer-panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 290px;
+      background: var(--surface);
+      box-shadow: var(--shadow-lg);
+      z-index: 121;
+      transform: translateX(-100%);
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+    .drawer-overlay.open .drawer-panel {
+      transform: translateX(0);
+    }
+    .drawer-header {
+      padding: 22px 18px 16px 18px;
+      background: var(--surface-low);
+      border-bottom: 1px solid var(--surface-container);
+    }
+    .drawer-divider {
+      border: none;
+      border-top: 1px solid var(--surface-container);
+      margin: 6px 0;
+    }
+    .drawer-nav-list {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex: 1;
+    }
+    .drawer-nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: none;
+      background: transparent;
+      color: var(--on-surface);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: left;
+      width: 100%;
+    }
+    .drawer-nav-item:hover {
+      background: var(--surface-low);
+      color: var(--primary);
+    }
+    .drawer-nav-item.active {
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+    .theme-segment-bar {
+      display: flex;
+      background: var(--surface-variant);
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      border: 1px solid var(--outline-variant);
+    }
+    .theme-segment-chip {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 7px 6px;
+      border: none;
+      background: transparent;
+      border-radius: 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .theme-segment-chip.active {
+      background: var(--surface);
+      color: var(--primary);
+      box-shadow: var(--shadow-sm);
+    }
+    .category-chips-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .category-chip-btn {
+      padding: 8px 6px;
+      border-radius: 10px;
+      border: 1.5px solid var(--outline-variant);
+      background: var(--surface);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--on-surface);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .category-chip-btn.selected {
+      border-color: var(--primary);
+      background: var(--primary-container);
+      color: var(--on-primary-container);
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Top toolbar for Role switching and Frame options -->
+  <div class="preview-header">
+    <div class="preview-title-badge">
+      <div class="pulse-dot"></div>
+      <span id="preview-role-label">TrackEdu (ADMIN Portal)</span>
+    </div>
+    <div class="role-toggle-bar">
+      <button class="role-pill-btn active" id="pill-admin" onclick="switchRole('ADMIN')">Admin</button>
+      <button class="role-pill-btn" id="pill-teacher" onclick="switchRole('TEACHER')">Teacher</button>
+    </div>
+  </div>
+
+  <!-- Mobile Screen Container -->
+  <div class="phone-container" id="phone-container">
+    
+    
+    <!-- Navigation Drawer Overlay -->
+    <div class="drawer-overlay" id="drawer-overlay" onclick="handleDrawerBackdropClick(event)">
+      <div class="drawer-panel" id="drawer-panel">
+        <!-- Drawer Header -->
+        <div class="drawer-header">
+          <div style="display: flex; align-items: center; gap: 12px;">
+            <div class="student-avatar" id="drawer-avatar" style="width: 44px; height: 44px; font-size: 16px; background: var(--primary); color: white;">PS</div>
+            <div>
+              <div id="drawer-user-name" style="font-size: 14px; font-weight: 800; color: var(--on-surface);">Prof. Sharma</div>
+              <div id="drawer-user-email" style="font-size: 11px; color: var(--on-surface-variant);">admin@campus.edu</div>
+              <span class="badge badge-good" id="drawer-role-badge" style="font-size: 9px; margin-top: 3px; display: inline-block;">ADMIN</span>
+            </div>
+          </div>
+        </div>
+        
+        <hr class="drawer-divider" />
+        
+        <!-- Drawer Nav List -->
+        <div class="drawer-nav-list">
+          <button class="drawer-nav-item" onclick="drawerNavigate('DASHBOARD')">
+            <span class="material-symbols-rounded">dashboard</span>
+            <span>Dashboard</span>
+          </button>
+          <button class="drawer-nav-item" onclick="drawerNavigate('STUDENTS')">
+            <span class="material-symbols-rounded">groups</span>
+            <span>Students Roster</span>
+          </button>
+          <button class="drawer-nav-item" onclick="drawerNavigate('MARK_ATTENDANCE')">
+            <span class="material-symbols-rounded">assignment_turned_in</span>
+            <span>Mark Attendance</span>
+          </button>
+          <button class="drawer-nav-item" onclick="drawerNavigate('REQUESTS')">
+            <span class="material-symbols-rounded">fact_check</span>
+            <span>Requests Center</span>
+          </button>
+          <button class="drawer-nav-item" onclick="drawerNavigate('NOTIFICATIONS')">
+            <span class="material-symbols-rounded">notifications</span>
+            <span>Notifications</span>
+          </button>
+          <button class="drawer-nav-item" onclick="drawerNavigate('REPORTS')">
+            <span class="material-symbols-rounded">insights</span>
+            <span>Academic Analytics</span>
+          </button>
+          <button class="drawer-nav-item" onclick="drawerNavigate('SETTINGS')">
+            <span class="material-symbols-rounded">settings</span>
+            <span>Settings</span>
+          </button>
+        </div>
+        
+        <hr class="drawer-divider" />
+        
+        <!-- Appearance Switcher in Drawer -->
+        <div style="padding: 10px 16px;">
+          <div style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Appearance</div>
+          <div class="theme-segment-bar">
+            <button class="theme-segment-chip active" id="drawer-theme-light" onclick="setTheme('LIGHT')">
+              <span class="material-symbols-rounded" style="font-size: 16px;">light_mode</span>
+              <span>Light</span>
+            </button>
+            <button class="theme-segment-chip" id="drawer-theme-dark" onclick="setTheme('DARK')">
+              <span class="material-symbols-rounded" style="font-size: 16px;">dark_mode</span>
+              <span>Dark</span>
+            </button>
+            <button class="theme-segment-chip" id="drawer-theme-system" onclick="setTheme('SYSTEM')">
+              <span class="material-symbols-rounded" style="font-size: 16px;">devices</span>
+              <span>System</span>
+            </button>
+          </div>
+        </div>
+        
+        <hr class="drawer-divider" style="margin-top: auto;" />
+        
+        <div style="padding: 12px 16px;">
+          <button class="btn btn-outline" style="width: 100%; color: var(--absent-red); border: 1.5px solid #FFDAD6; background: #FFF5F5; font-weight: 700; font-size: 12px;" onclick="closeDrawer(); showLogoutConfirmModal();">
+            <span class="material-symbols-rounded" style="font-size: 18px;">logout</span>
+            <span>Sign Out</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Android Status Bar -->
+    <div class="android-status-bar">
+      <span id="live-clock">10:15</span>
+      <div class="status-camera-notch"></div>
+      <div class="status-icons">
+        <span class="material-symbols-rounded" style="font-size: 14px;">signal_cellular_4_bar</span>
+        <span class="material-symbols-rounded" style="font-size: 14px;">wifi</span>
+        <span class="material-symbols-rounded" style="font-size: 14px;">battery_full</span>
+      </div>
+    </div>
+
+    <!-- App Top Bar (Dynamic) -->
+    <div class="app-top-bar" id="app-top-bar">
+      <div class="app-brand">
+        <button class="icon-btn" onclick="openDrawer()" title="Navigation Drawer" style="margin-right: 4px;" id="topbar-drawer-btn">
+          <span class="material-symbols-rounded">menu</span>
+        </button>
+        <div class="app-logo-icon">
+          <span class="material-symbols-rounded">school</span>
+        </div>
+        <div class="app-brand-text">
+          <h1>TrackEdu</h1>
+          <p id="topbar-subtitle">Computer Science • ADMIN</p>
+        </div>
+      </div>
+      <div class="top-bar-actions">
+        <button class="icon-btn" onclick="navigateTo('NOTIFICATIONS')" title="Notifications">
+          <span class="material-symbols-rounded">notifications</span>
+          <span class="badge-count" id="notif-badge-count">3</span>
+        </button>
+        <button class="avatar-btn" id="topbar-avatar" onclick="navigateTo('SETTINGS')" title="Profile">PS</button>
+        <button class="icon-btn" onclick="showLogoutConfirmModal()" title="Sign Out" style="color: var(--absent-red);">
+          <span class="material-symbols-rounded">logout</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Screen Content Container -->
+    <div class="screen-content" id="screen-content"></div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="app-bottom-bar" id="app-bottom-bar">
+      <button class="nav-item active" id="nav-DASHBOARD" onclick="navigateTo('DASHBOARD')">
+        <div class="nav-icon-wrapper">
+          <span class="material-symbols-rounded">dashboard</span>
+        </div>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" id="nav-STUDENTS" onclick="navigateTo('STUDENTS')">
+        <div class="nav-icon-wrapper">
+          <span class="material-symbols-rounded">groups</span>
+        </div>
+        <span>Students</span>
+      </button>
+      <button class="nav-item" id="nav-MARK_ATTENDANCE" onclick="navigateTo('MARK_ATTENDANCE')">
+        <div class="nav-icon-wrapper">
+          <span class="material-symbols-rounded">assignment_turned_in</span>
+        </div>
+        <span>Mark Roll</span>
+      </button>
+      <button class="nav-item" id="nav-REQUESTS" onclick="navigateTo('REQUESTS')">
+        <div class="nav-icon-wrapper">
+          <span class="material-symbols-rounded">fact_check</span>
+        </div>
+        <span>Requests</span>
+      </button>
+      <button class="nav-item" id="nav-REPORTS" onclick="navigateTo('REPORTS')">
+        <div class="nav-icon-wrapper">
+          <span class="material-symbols-rounded">insights</span>
+        </div>
+        <span>Analytics</span>
+      </button>
+    </div>
+
+    <!-- Android 3-Button System Navigation Bar -->
+    <div class="android-nav-bar" id="android-nav-bar">
+      <span class="material-symbols-rounded android-nav-btn" onclick="handleAndroidBack()" title="System Back">arrow_back</span>
+      <span class="material-symbols-rounded android-nav-btn" onclick="handleAndroidHome()" title="Home">radio_button_unchecked</span>
+      <span class="material-symbols-rounded android-nav-btn" onclick="showToast('Active Process: TrackEdu Academic Suite 2026')" title="Overview">crop_square</span>
+    </div>
+
+    <!-- Floating Action Button -->
+    <button class="fab-btn" id="fab-add-student" style="display: none;" onclick="handleFabClick()">
+      <span class="material-symbols-rounded">person_add</span>
+    </button>
+
+    <!-- Toast Snackbar Container -->
+    <div class="toast-snackbar" id="toast-snackbar">
+      <span id="toast-text">Message</span>
+      <span class="material-symbols-rounded" style="cursor: pointer; font-size: 16px;" onclick="hideToast()">close</span>
+    </div>
+
+    <!-- Modal Dialog Container -->
+    <div class="modal-overlay" id="modal-overlay">
+      <div class="modal-box" id="modal-box"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // --- Room Database Simulation & Reactive State ---
+    const initialStudents = [
+      { id: 1, name: "Rahul Kumar", rollNumber: "23CS101", department: "Computer Science & Engineering", year: "III Year", section: "Section A", email: "rahul.k@college.edu", phone: "+91 98765 43210", parentName: "Mr. Suresh Kumar", parentPhone: "+91 98111 22334", avatarInitials: "RK" },
+      { id: 2, name: "Arun Kumar", rollNumber: "23CS102", department: "Computer Science & Engineering", year: "III Year", section: "Section A", email: "arun.k@college.edu", phone: "+91 98765 12345", parentName: "Mrs. Sunita Kumar", parentPhone: "+91 98222 33445", avatarInitials: "AK" },
+      { id: 3, name: "Priya Sharma", rollNumber: "23CS103", department: "Computer Science & Engineering", year: "III Year", section: "Section A", email: "priya.s@college.edu", phone: "+91 98765 23456", parentName: "Mr. Ramesh Sharma", parentPhone: "+91 98333 44556", avatarInitials: "PS" },
+      { id: 4, name: "Sneha Patel", rollNumber: "23CS104", department: "Computer Science & Engineering", year: "III Year", section: "Section B", email: "sneha.p@college.edu", phone: "+91 98765 34567", parentName: "Mr. Rajesh Patel", parentPhone: "+91 98444 55667", avatarInitials: "SP" },
+      { id: 5, name: "Vikram Singh", rollNumber: "23CS105", department: "Computer Science & Engineering", year: "III Year", section: "Section A", email: "vikram.s@college.edu", phone: "+91 98765 45678", parentName: "Col. R.S. Singh", parentPhone: "+91 98555 66778", avatarInitials: "VS" },
+      { id: 6, name: "Ananya Verma", rollNumber: "23CS106", department: "Computer Science & Engineering", year: "III Year", section: "Section A", email: "ananya.v@college.edu", phone: "+91 98765 56789", parentName: "Mrs. Meenakshi Verma", parentPhone: "+91 98666 77889", avatarInitials: "AV" },
+      { id: 7, name: "Rohan Gupta", rollNumber: "23CS107", department: "Computer Science & Engineering", year: "III Year", section: "Section A", email: "rohan.g@college.edu", phone: "+91 98765 67890", parentName: "Mr. Ashok Gupta", parentPhone: "+91 98777 88990", avatarInitials: "RG" },
+      { id: 8, name: "Pooja Nair", rollNumber: "23CS108", department: "Computer Science & Engineering", year: "III Year", section: "Section B", email: "pooja.n@college.edu", phone: "+91 98765 78901", parentName: "Mr. K. Nair", parentPhone: "+91 98888 99001", avatarInitials: "PN" }
+    ];
+
+    const pastDates = ["2026-09-07", "2026-09-06", "2026-09-05", "2026-09-04", "2026-09-03", "2026-09-02", "2026-09-01"];
+
+    function generateInitialRecords() {
+      const records = [];
+      let recordId = 1;
+      initialStudents.forEach(student => {
+        pastDates.forEach((dateStr, dIndex) => {
+          const isAbsent = (student.rollNumber === "23CS101" && (dIndex === 0 || dIndex === 3)) ||
+                           (student.rollNumber === "23CS105" && (dIndex === 0 || dIndex === 2 || dIndex === 4)) ||
+                           (student.rollNumber === "23CS102" && (dIndex === 1 || dIndex === 5));
+          const isOD = student.rollNumber === "23CS105" && dIndex === 2;
+
+          records.push({
+            id: recordId++,
+            studentId: student.id,
+            date: dateStr,
+            status: isAbsent && !isOD ? "ABSENT" : "PRESENT",
+            type: isOD ? "OD" : "REGULAR",
+            subject: ["CS502 - Database Systems", "CS501 - Operating Systems", "CS503 - Computer Networks", "CS504 - Software Engineering"][dIndex % 4],
+            period: "Period 2 (10:15 AM - 11:15 AM)",
+            note: isOD ? "Approved On Duty (OD) for Hackathon" : (isAbsent ? "Recorded unexcused absence" : "Verified regular attendance"),
+            remarks: isOD ? "Approved by Admin" : "",
+            createdBy: "Prof. Sharma"
+          });
+        });
+      });
+      return records;
+    }
+
+    const initialRequests = [
+      {
+        id: 101,
+        type: "ADD_STUDENT",
+        submittedBy: "Dr. Anjali Rao (Teacher)",
+        studentName: "Kavya Deshmukh",
+        studentRollNumber: "23CS109",
+        department: "Computer Science & Engineering",
+        year: "III Year",
+        section: "Section A",
+        email: "kavya.d@college.edu",
+        phone: "+91 98765 89012",
+        parentName: "Mr. Nitin Deshmukh",
+        parentPhone: "+91 98999 11223",
+        reason: "Lateral entry student admitted late through counseling.",
+        status: "PENDING",
+        date: "2026-09-07"
+      },
+      {
+        id: 102,
+        type: "ATTENDANCE_CORRECTION",
+        submittedBy: "Dr. Anjali Rao (Teacher)",
+        studentId: 1,
+        studentName: "Rahul Kumar",
+        studentRollNumber: "23CS101",
+        date: "2026-09-04",
+        subject: "CS504 - Software Engineering",
+        requestedStatus: "PRESENT",
+        requestedType: "MEDICAL",
+        reason: "Verified dental hospital prescription submitted.",
+        status: "PENDING"
+      }
+    ];
+
+    const initialNotifications = [
+      { id: 1, title: "Shortage Radar Alert", message: "Rahul Kumar (68%) and Vikram Singh (71%) are below the 75% threshold in CSE-III A.", category: "WARNINGS", isRead: false, targetScreen: "STUDENTS" },
+      { id: 2, title: "Student Registration Request", message: "Dr. Anjali Rao requested registration approval for Kavya Deshmukh (23CS109).", category: "REQUESTS", isRead: false, targetScreen: "REQUESTS" },
+      { id: 3, title: "Daily Roll Call Reminder", message: "CS502 Database Systems roll call is scheduled for Period 2 today.", category: "ATTENDANCE", isRead: false, targetScreen: "MARK_ATTENDANCE" }
+    ];
+
+    const savedSession = JSON.parse(localStorage.getItem('trackedu_session'));
+    let state = {
+      isLoggedIn: savedSession ? Boolean(savedSession.isLoggedIn) : false,
+      role: savedSession ? savedSession.role : 'ADMIN',
+      currentUserName: savedSession ? savedSession.name : 'Prof. Sharma',
+      currentUserEmail: savedSession ? savedSession.email : 'admin@campus.edu',
+      students: JSON.parse(localStorage.getItem('trackedu_students')) || initialStudents,
+      records: JSON.parse(localStorage.getItem('trackedu_records')) || generateInitialRecords(),
+      requests: JSON.parse(localStorage.getItem('trackedu_requests')) || initialRequests,
+      notifications: JSON.parse(localStorage.getItem('trackedu_notifications')) || initialNotifications,
+      currentScreen: 'SPLASH',
+      selectedStudentId: null,
+      selectedDate: "2026-09-07",
+      selectedSubject: "CS502 - Database Systems",
+      selectedBatch: "CSE - III A (Semester 5)",
+      searchQuery: "",
+      filterTab: "All",
+      mandatoryThreshold: 75,
+      activeSessionDraft: {},
+      themeMode: localStorage.getItem("trackedu_theme_mode") || "LIGHT"
+    };
+
+    function saveState() {
+      localStorage.setItem('trackedu_students', JSON.stringify(state.students));
+      localStorage.setItem('trackedu_records', JSON.stringify(state.records));
+      localStorage.setItem('trackedu_requests', JSON.stringify(state.requests));
+      localStorage.setItem('trackedu_notifications', JSON.stringify(state.notifications));
+      updateNotificationBadge();
+    }
+
+    function initDraftForDate(date) {
+      const existing = state.records.filter(r => r.date === date);
+      const draft = {};
+      state.students.forEach(s => {
+        const found = existing.find(r => r.studentId === s.id);
+        draft[s.id] = found ? found.status : "PRESENT";
+      });
+      state.activeSessionDraft = draft;
+    }
+    initDraftForDate(state.selectedDate);
+
+    // Dynamic Calculation with Special Cases & New Student 0-Record Fix
+    function getStudentStats(studentId) {
+      const student = state.students.find(s => s.id === studentId);
+      if (!student) return null;
+      const studentRecords = state.records.filter(r => r.studentId === studentId);
+      const total = studentRecords.length;
+      
+      // Special Cases (OD, MEDICAL, SPORTS, EXAM, LEAVE) count as Attended
+      const attended = studentRecords.filter(r => 
+        r.status === "PRESENT" || ["OD", "MEDICAL", "SPORTS", "EXAM", "LEAVE"].includes(r.type)
+      ).length;
+      const specialCount = studentRecords.filter(r => r.type && r.type !== "REGULAR" && r.type !== "CORRECTION").length;
+      const missed = total - attended;
+
+      // CRITICAL FIX: If total == 0, percentage is null (No attendance recorded) NOT 100%
+      const percentage = total > 0 ? (attended / total) * 100 : null;
+
+      let tier = "GOOD";
+      if (percentage === null) tier = "NO_RECORDS";
+      else if (percentage >= 90) tier = "EXCELLENT";
+      else if (percentage >= 75) tier = "GOOD";
+      else if (percentage >= 65) tier = "WARNING";
+      else tier = "CRITICAL";
+
+      return { student, total, attended, missed, specialCount, percentage, tier };
+    }
+
+    function getAllStudentsWithStats() {
+      return state.students.map(s => getStudentStats(s.id));
+    }
+
+    function updateNotificationBadge() {
+      const unread = state.notifications.filter(n => !n.isRead).length;
+      const badge = document.getElementById('notif-badge-count');
+      if (badge) {
+        badge.innerText = unread;
+        badge.style.display = unread > 0 ? 'flex' : 'none';
+      }
+    }
+
+    // Role Switcher Handler
+    function switchRole(role) {
+      state.role = role;
+      if (role === 'ADMIN') {
+        state.currentUserName = 'Prof. Sharma';
+        state.currentUserEmail = 'admin@campus.edu';
+      } else {
+        state.currentUserName = 'Dr. Anjali Rao';
+        state.currentUserEmail = 'teacher@campus.edu';
+      }
+
+      document.getElementById('pill-admin').classList.toggle('active', role === 'ADMIN');
+      document.getElementById('pill-teacher').classList.toggle('active', role === 'TEACHER');
+      document.getElementById('preview-role-label').innerText = `TrackEdu (${role} Portal)`;
+      document.getElementById('topbar-avatar').innerText = role === 'ADMIN' ? 'PS' : 'AR';
+
+      showToast(`Switched to ${role} Role (${state.currentUserName})`);
+      navigateTo('DASHBOARD');
+    }
+
+    // Navigation System
+    function navigateTo(screen, studentId = null) {
+      state.currentScreen = screen;
+      if (studentId !== null) state.selectedStudentId = studentId;
+
+      const topBar = document.getElementById('app-top-bar');
+      const bottomBar = document.getElementById('app-bottom-bar');
+      const androidNav = document.getElementById('android-nav-bar');
+      const fab = document.getElementById('fab-add-student');
+      const previewToggle = document.querySelector('.role-toggle-bar');
+
+      const isAuthScreen = (screen === 'SPLASH' || screen === 'LOGIN');
+
+      if (topBar) topBar.style.display = isAuthScreen ? 'none' : 'flex';
+      if (bottomBar) bottomBar.style.display = isAuthScreen ? 'none' : 'flex';
+      if (androidNav) androidNav.style.display = 'flex';
+      if (fab) fab.style.display = (!isAuthScreen && screen === 'STUDENTS') ? 'flex' : 'none';
+      if (previewToggle) previewToggle.style.display = isAuthScreen ? 'none' : 'flex';
+
+      const navScreens = ['DASHBOARD', 'STUDENTS', 'MARK_ATTENDANCE', 'REQUESTS', 'REPORTS', 'SETTINGS'];
+      navScreens.forEach(sc => {
+        const el = document.getElementById(`nav-${sc}`);
+        if (el) el.classList.toggle('active', sc === screen);
+      });
+
+      const subtitleEl = document.getElementById('topbar-subtitle');
+      if (subtitleEl) {
+        if (screen === 'DASHBOARD') subtitleEl.innerText = `Computer Science • ${state.role}`;
+        else if (screen === 'STUDENTS') subtitleEl.innerText = `Student Directory (${state.students.length})`;
+        else if (screen === 'REQUESTS') subtitleEl.innerText = state.role === 'ADMIN' ? "Admin Approval Center" : "Teacher Requests";
+        else if (screen === 'NOTIFICATIONS') subtitleEl.innerText = "Notification Center";
+        else if (screen === 'REPORTS') subtitleEl.innerText = "Academic Analytics";
+        else if (screen === 'SETTINGS') subtitleEl.innerText = `${state.role} Settings`;
+        else subtitleEl.innerText = "Student Attendance";
+      }
+
+      renderScreen();
+    }
+
+    function handleFabClick() {
+      if (state.role === 'ADMIN') {
+        navigateTo('ADD_STUDENT');
+      } else {
+        navigateTo('REQUEST_STUDENT');
+      }
+    }
+
+    // --- Screen Renderers ---
+    function renderScreen() {
+      const container = document.getElementById('screen-content');
+      container.innerHTML = '';
+
+      switch (state.currentScreen) {
+        case 'SPLASH': renderSplash(container); break;
+        case 'LOGIN': renderLogin(container); break;
+        case 'DASHBOARD': renderDashboard(container); break;
+        case 'STUDENTS': renderStudentsRoster(container); break;
+        case 'MARK_ATTENDANCE': renderMarkAttendance(container); break;
+        case 'STUDENT_DETAIL': renderStudentDetail(container); break;
+        case 'ADD_STUDENT': renderAddStudent(container); break;
+        case 'REQUEST_STUDENT': renderRequestStudent(container); break;
+        case 'SPECIAL_ATTENDANCE_REQUEST': renderSpecialAttendanceRequest(container); break;
+        case 'REQUESTS': renderRequestsScreen(container); break;
+        case 'NOTIFICATIONS': renderNotificationsScreen(container); break;
+        case 'REPORTS': renderReports(container); break;
+        case 'SETTINGS': renderSettings(container); break;
+        default: renderDashboard(container);
+      }
+      container.scrollTop = 0;
+      updateNotificationBadge();
+    }
+
+    // --- 0. MOTION SPLASH SCREEN ---
+    function renderSplash(container) {
+      container.innerHTML = `
+        <div class="splash-container">
+          <div class="splash-logo-box">
+            <span class="material-symbols-rounded" style="font-size: 48px;">school</span>
+          </div>
+          <div class="splash-title">TrackEdu</div>
+          <div class="splash-subtitle">Student Attendance Management</div>
+          <div class="splash-tagline">Smarter attendance. Better academic tracking.</div>
+
+          <div class="splash-pulse-dots">
+            <div class="splash-dot"></div>
+            <div class="splash-dot"></div>
+            <div class="splash-dot"></div>
+          </div>
+
+          <div class="splash-version-footer">TrackEdu v2.4 • Offline Suite</div>
+        </div>
+      `;
+
+      // 1.8s Motion Sequence then Check Session
+      setTimeout(() => {
+        const session = JSON.parse(localStorage.getItem('trackedu_session'));
+        if (session && session.isLoggedIn) {
+          state.isLoggedIn = true;
+          state.role = session.role;
+          state.currentUserName = session.name;
+          state.currentUserEmail = session.email;
+
+          const adminPill = document.getElementById('pill-admin');
+          const teacherPill = document.getElementById('pill-teacher');
+          if (adminPill && teacherPill) {
+            adminPill.classList.toggle('active', state.role === 'ADMIN');
+            teacherPill.classList.toggle('active', state.role === 'TEACHER');
+          }
+          const roleLabel = document.getElementById('preview-role-label');
+          if (roleLabel) roleLabel.innerText = `TrackEdu (${state.role} Portal)`;
+          const avatarBtn = document.getElementById('topbar-avatar');
+          if (avatarBtn) avatarBtn.innerText = state.role === 'ADMIN' ? 'PS' : 'AR';
+
+          navigateTo('DASHBOARD');
+        } else {
+          state.isLoggedIn = false;
+          navigateTo('LOGIN');
+        }
+      }, 1800);
+    }
+
+    // --- 0.1 LANDING / LOGIN SCREEN ---
+    let passwordVisible = false;
+
+    function getStoredUsers() {
+      let users = JSON.parse(localStorage.getItem('trackedu_users') || 'null');
+      if (!users || users.length === 0) {
+        users = [
+          {
+            id: 1,
+            name: "System Administrator",
+            email: "admin@institutedomain.edu",
+            passwordHash: "AdminPass2026",
+            role: "ADMIN",
+            department: "Computer Science & Engineering",
+            isActive: true
+          }
+        ];
+        localStorage.setItem('trackedu_users', JSON.stringify(users));
+      }
+      return users;
+    }
+
+    function renderLogin(container) {
+      const savedRemember = JSON.parse(localStorage.getItem('trackedu_remember_me') || 'null');
+      const initialUsername = savedRemember ? savedRemember.username : '';
+      const isRememberChecked = savedRemember ? 'checked' : '';
+
+      container.innerHTML = `
+        <div class="login-container">
+          <!-- Branding Header -->
+          <div class="login-brand-header">
+            <div class="login-logo">
+              <span class="material-symbols-rounded" style="font-size: 34px;">school</span>
+            </div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px;">TrackEdu</div>
+            <div style="font-size: 13px; font-weight: 700; color: var(--on-surface);">Student Attendance Management</div>
+            <p style="font-size: 11px; color: var(--on-surface-variant); max-width: 290px; line-height: 1.4; margin-top: 2px;">
+              Manage students, attendance and academic insights with secure database authentication.
+            </p>
+          </div>
+
+          <!-- Error Notice Banner -->
+          <div class="error-banner" id="login-error-banner">
+            <span class="material-symbols-rounded" style="font-size: 18px;">error</span>
+            <span id="login-error-text">Invalid username or password.</span>
+          </div>
+
+          <!-- Login Card -->
+          <div class="login-card">
+            <form id="login-form" onsubmit="event.preventDefault(); handleLoginSubmit();">
+              <div class="form-group" style="margin-bottom: 12px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 6px; display: block;">Username or Email</label>
+                <div class="input-wrapper">
+                  <span class="material-symbols-rounded input-icon-lead">account_circle</span>
+                  <input type="text" id="login-username" class="form-control input-with-icon" placeholder="Enter institutional email" value="${initialUsername}" autocomplete="username" />
+                </div>
+              </div>
+
+              <div class="form-group" style="margin-bottom: 14px;">
+                <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 6px; display: block;">Password</label>
+                <div class="input-wrapper">
+                  <span class="material-symbols-rounded input-icon-lead">lock</span>
+                  <input type="password" id="login-password" class="form-control input-with-icon" placeholder="Enter password" autocomplete="current-password" />
+                  <button type="button" class="input-eye-btn" onclick="togglePasswordVisibility()" title="Toggle password visibility">
+                    <span class="material-symbols-rounded" id="eye-icon" style="font-size: 20px;">visibility_off</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Remember Me & Forgot Password Row -->
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; font-size: 11px; color: var(--on-surface-variant);">
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <input type="checkbox" id="login-remember" ${isRememberChecked} style="accent-color: var(--primary); cursor: pointer;" />
+                  <label for="login-remember" style="cursor: pointer; font-weight: 600;">Remember me</label>
+                </div>
+                <a href="javascript:void(0)" onclick="openForgotPasswordModal()" style="font-weight: 700; color: var(--primary); text-decoration: none; cursor: pointer;">Forgot Password?</a>
+              </div>
+
+              <button type="submit" class="btn btn-primary" id="btn-login-submit" style="width: 100%; height: 48px; font-size: 14px; font-weight: 800;">
+                <span class="material-symbols-rounded spinner-icon" id="login-spinner" style="display: none;">progress_activity</span>
+                <span class="material-symbols-rounded" id="login-key-icon">key</span>
+                <span id="login-submit-text">LOGIN</span>
+              </button>
+            </form>
+          </div>
+
+          <div style="text-align: center; font-size: 10px; color: var(--outline); font-weight: 600; margin-top: 10px;">
+            TrackEdu Academic Suite • Database-Backed Authentication • 5-Minute Session
+          </div>
+        </div>
+      `;
+    }
+
+    function togglePasswordVisibility() {
+      const passwordInput = document.getElementById('login-password');
+      const eyeIcon = document.getElementById('eye-icon');
+      if (!passwordInput || !eyeIcon) return;
+      passwordVisible = !passwordVisible;
+      passwordInput.type = passwordVisible ? 'text' : 'password';
+      eyeIcon.innerText = passwordVisible ? 'visibility' : 'visibility_off';
+    }
+
+    function handleLoginSubmit() {
+      const usernameInput = document.getElementById('login-username');
+      const passwordInput = document.getElementById('login-password');
+      const errorBox = document.getElementById('login-error-banner');
+      const errorText = document.getElementById('login-error-text');
+      const submitBtn = document.getElementById('btn-login-submit');
+      const submitText = document.getElementById('login-submit-text');
+      const spinner = document.getElementById('login-spinner');
+      const keyIcon = document.getElementById('login-key-icon');
+
+      const username = usernameInput ? usernameInput.value.trim() : '';
+      const password = passwordInput ? passwordInput.value.trim() : '';
+
+      if (errorBox) errorBox.style.display = 'none';
+
+      if (!username) {
+        if (errorText) errorText.innerText = 'Username or Email is required.';
+        if (errorBox) errorBox.style.display = 'flex';
+        if (usernameInput) usernameInput.focus();
+        return;
+      }
+
+      if (!password) {
+        if (errorText) errorText.innerText = 'Password is required.';
+        if (errorBox) errorBox.style.display = 'flex';
+        if (passwordInput) passwordInput.focus();
+        return;
+      }
+
+      // Show loading indicator
+      if (submitBtn) submitBtn.disabled = true;
+      if (spinner) spinner.style.display = 'inline-block';
+      if (keyIcon) keyIcon.style.display = 'none';
+      if (submitText) submitText.innerText = 'Verifying Database Credentials...';
+
+      setTimeout(() => {
+        const users = getStoredUsers();
+        const matchedUser = users.find(u => 
+          (u.email.toLowerCase() === username.toLowerCase() || (u.username && u.username.toLowerCase() === username.toLowerCase())) &&
+          (u.passwordHash === password || u.password === password)
+        );
+
+        if (!matchedUser) {
+          if (submitBtn) submitBtn.disabled = false;
+          if (spinner) spinner.style.display = 'none';
+          if (keyIcon) keyIcon.style.display = 'inline-block';
+          if (submitText) submitText.innerText = 'LOGIN';
+          if (errorText) errorText.innerText = 'Invalid email or password.';
+          if (errorBox) errorBox.style.display = 'flex';
+          return;
+        }
+
+        if (matchedUser.isActive === false) {
+          if (submitBtn) submitBtn.disabled = false;
+          if (spinner) spinner.style.display = 'none';
+          if (keyIcon) keyIcon.style.display = 'inline-block';
+          if (submitText) submitText.innerText = 'LOGIN';
+          if (errorText) errorText.innerText = 'This account has been deactivated. Contact an administrator.';
+          if (errorBox) errorBox.style.display = 'flex';
+          return;
+        }
+
+        // Successfully Authenticated: role loaded from database record
+        state.isLoggedIn = true;
+        state.role = matchedUser.role;
+        state.currentUserName = matchedUser.name;
+        state.currentUserEmail = matchedUser.email;
+
+        // Persist Remember Me
+        const rememberCheckbox = document.getElementById('login-remember');
+        if (rememberCheckbox && rememberCheckbox.checked) {
+          localStorage.setItem('trackedu_remember_me', JSON.stringify({ username }));
+        } else {
+          localStorage.removeItem('trackedu_remember_me');
+        }
+
+        localStorage.setItem('trackedu_session', JSON.stringify({
+          ...matchedUser,
+          isLoggedIn: true,
+          expiryTime: Date.now() + 300 * 1000
+        }));
+        startSessionTimer();
+
+        const adminPill = document.getElementById('pill-admin');
+        const teacherPill = document.getElementById('pill-teacher');
+        if (adminPill && teacherPill) {
+          adminPill.classList.toggle('active', state.role === 'ADMIN');
+          teacherPill.classList.toggle('active', state.role === 'TEACHER');
+        }
+        const roleLabel = document.getElementById('preview-role-label');
+        if (roleLabel) roleLabel.innerText = `TrackEdu (${state.role} Portal)`;
+        const avatarBtn = document.getElementById('topbar-avatar');
+        if (avatarBtn) avatarBtn.innerText = state.role === 'ADMIN' ? 'PS' : 'AR';
+
+        showToast(`Welcome back, ${matchedUser.name} (${matchedUser.role})!`);
+        navigateTo('DASHBOARD');
+      }, 350);
+    }
+
+    function openForgotPasswordModal() {
+      showModal(`
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: #DBEAFE; color: var(--primary); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">lock_reset</span>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--on-surface);">Reset Password</div>
+            <div style="font-size: 11px; color: var(--on-surface-variant);">Verify registered campus email</div>
+          </div>
+        </div>
+        <p style="font-size: 12px; color: var(--on-surface-variant); line-height: 1.4; margin-bottom: 12px;">
+          Please enter your institutional email address to verify your account and receive password recovery instructions.
+        </p>
+        <div class="form-group" style="margin-bottom: 14px;">
+          <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; display: block;">Institutional Email</label>
+          <input type="email" id="forgot-email-input" class="form-control" placeholder="e.g. admin@campus.edu" style="width: 100%;" />
+          <div id="forgot-error-msg" style="display: none; color: var(--absent-red); font-size: 11px; font-weight: 600; margin-top: 4px;"></div>
+        </div>
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+          <button class="btn btn-secondary btn-sm" onclick="hideModal()">Cancel</button>
+          <button class="btn btn-primary btn-sm" onclick="submitForgotPassword()">Send Instructions</button>
+        </div>
+      `);
+    }
+
+    function submitForgotPassword() {
+      const emailInput = document.getElementById('forgot-email-input');
+      const errorMsg = document.getElementById('forgot-error-msg');
+      const email = emailInput ? emailInput.value.trim() : '';
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      if (!email) {
+        if (errorMsg) {
+          errorMsg.innerText = 'Please enter your registered campus email.';
+          errorMsg.style.display = 'block';
+        }
+        return;
+      }
+      if (!emailRegex.test(email)) {
+        if (errorMsg) {
+          errorMsg.innerText = 'Invalid email format. Please enter name@campus.edu';
+          errorMsg.style.display = 'block';
+        }
+        return;
+      }
+
+      hideModal();
+      showToast(`Password recovery link dispatched to ${email}`);
+    }
+
+    // Android Navigation Back & Home Handlers
+    function handleAndroidBack() {
+      if (state.currentScreen === 'DASHBOARD' || state.currentScreen === 'LOGIN' || state.currentScreen === 'SPLASH') {
+        showToast("Press Home to exit TrackEdu");
+        return;
+      }
+      navigateTo('DASHBOARD');
+    }
+
+    function handleAndroidHome() {
+      if (state.currentScreen === 'SPLASH') return;
+      if (state.isLoggedIn) {
+        navigateTo('DASHBOARD');
+      } else {
+        navigateTo('LOGIN');
+      }
+    }
+
+    function showLogoutConfirmModal() {
+      showModal(`
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 6px;">
+          <div style="width: 40px; height: 40px; border-radius: 12px; background: #FFDAD6; color: var(--absent-red); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-rounded">logout</span>
+          </div>
+          <div>
+            <div style="font-size: 16px; font-weight: 800; color: var(--on-surface);">Confirm Sign Out</div>
+            <div style="font-size: 11px; color: var(--on-surface-variant);">Active: ${state.currentUserName} (${state.role})</div>
+          </div>
+        </div>
+        <p style="font-size: 12px; color: var(--on-surface-variant); line-height: 1.4; margin-bottom: 8px;">
+          Are you sure you want to sign out of TrackEdu? You will need your credentials to log in again.
+        </p>
+        <div style="display: flex; gap: 8px; justify-content: flex-end;">
+          <button class="btn btn-secondary btn-sm" onclick="hideModal()">Cancel</button>
+          <button class="btn btn-danger btn-sm" onclick="confirmLogout()">Sign Out</button>
+        </div>
+      `);
+    }
+
+    function confirmLogout() {
+      hideModal();
+      localStorage.removeItem('trackedu_session');
+      state.isLoggedIn = false;
+      state.currentUserName = 'Guest';
+      state.currentUserEmail = '';
+      showToast('Signed out of TrackEdu');
+      navigateTo('LOGIN');
+    }
+
+    // 1. DASHBOARD SCREEN (Role-Aware)
+    function renderDashboard(container) {
+      const statsList = getAllStudentsWithStats();
+      const todayRecords = state.records.filter(r => r.date === state.selectedDate);
+      const presentToday = todayRecords.filter(r => r.status === "PRESENT").length || 7;
+      const absentToday = todayRecords.filter(r => r.status === "ABSENT").length || 1;
+      const totalToday = state.students.length;
+      const todayTurnout = Math.round((presentToday / totalToday) * 100);
+      const shortageStudents = statsList.filter(s => s.percentage !== null && s.percentage < state.mandatoryThreshold);
+      const pendingRequests = state.requests.filter(r => r.status === 'PENDING');
+
+      const circumference = 2 * Math.PI * 34;
+      const strokeOffset = circumference - (todayTurnout / 100) * circumference;
+
+      container.innerHTML = `
+        <!-- Welcome Header with Role Badge -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant);">MONDAY, 07 SEP 2026</span>
+              <span class="badge ${state.role === 'ADMIN' ? 'badge-good' : 'badge-special'}" style="font-size: 9px; padding: 2px 6px;">${state.role}</span>
+            </div>
+            <div style="font-size: 20px; font-weight: 800; color: var(--on-surface); line-height: 1.2; margin-top: 2px;">
+              Good Morning,<br>${state.currentUserName}
+            </div>
+          </div>
+          <div style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-container); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; box-shadow: var(--shadow-sm);">
+            ${state.role === 'ADMIN' ? 'PS' : 'AR'}
+          </div>
+        </div>
+
+        <!-- Pending Approval Alert Banner (Admin or Teacher) -->
+        ${pendingRequests.length > 0 ? `
+          <div class="card" style="background: var(--warning-bg); border: 1px solid rgba(217, 119, 6, 0.3); padding: 12px 14px; cursor: pointer;" onclick="navigateTo('REQUESTS')">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="color: var(--warning-text); font-size: 20px;">fact_check</span>
+                <div>
+                  <div style="font-size: 12px; font-weight: 800; color: var(--warning-text);">${pendingRequests.length} Pending Approval Request${pendingRequests.length > 1 ? 's' : ''}</div>
+                  <div style="font-size: 11px; color: var(--warning-text); opacity: 0.9;">${state.role === 'ADMIN' ? 'Tap to review and approve' : 'Waiting for Admin approval'}</div>
+                </div>
+              </div>
+              <span class="material-symbols-rounded" style="color: var(--warning-text); font-size: 18px;">arrow_forward</span>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- Today's Roll Summary Hero Card -->
+        <div class="card" style="box-shadow: var(--shadow-md);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 800; color: var(--on-surface-variant);">
+              <span class="material-symbols-rounded" style="font-size: 16px; color: var(--primary);">today</span>
+              <span>TODAY — 07 SEP 2026</span>
+            </div>
+            <span class="badge" style="background: var(--surface-container); color: var(--on-surface-variant);">Active Session</span>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 12px; color: var(--on-surface-variant);">Enrolled Roll Call</div>
+              <div style="font-size: 30px; font-weight: 800; color: var(--on-surface); line-height: 1.1;">
+                ${totalToday} <span style="font-size: 14px; font-weight: 600; color: var(--on-surface-variant);">Pupils</span>
+              </div>
+              <div style="display: flex; gap: 6px; margin-top: 8px;">
+                <span class="badge badge-excellent"><span class="material-symbols-rounded" style="font-size: 13px;">check_circle</span> ${presentToday} Present</span>
+                <span class="badge badge-critical"><span class="material-symbols-rounded" style="font-size: 13px;">cancel</span> ${absentToday} Absent</span>
+              </div>
+            </div>
+
+            <!-- SVG Donut Progress Ring -->
+            <div class="donut-wrapper">
+              <svg class="donut-svg" viewBox="0 0 80 80">
+                <circle class="donut-circle-bg" cx="40" cy="40" r="34" />
+                <circle class="donut-circle-val" cx="40" cy="40" r="34" stroke-dasharray="${circumference}" stroke-dashoffset="${strokeOffset}" />
+              </svg>
+              <div class="donut-label">
+                <span class="pct">${todayTurnout}%</span>
+                <span class="sub">Turnout</span>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary" style="width: 100%; margin-top: 14px;" onclick="navigateTo('MARK_ATTENDANCE')">
+            <span class="material-symbols-rounded" style="font-size: 18px;">assignment_turned_in</span>
+            <span>Mark Today's Attendance</span>
+            <span class="material-symbols-rounded" style="font-size: 18px;">arrow_forward</span>
+          </button>
+        </div>
+
+        <!-- Quick Operations Grid (Role-Aware) -->
+        <div>
+          <div class="section-title">Quick Operations</div>
+          <div class="quick-grid">
+            <div class="quick-card" onclick="navigateTo('MARK_ATTENDANCE')">
+              <div class="quick-icon-box" style="background: var(--surface-high); color: var(--primary);">
+                <span class="material-symbols-rounded">assignment_turned_in</span>
+              </div>
+              <h4>Mark Roll</h4>
+              <p>Record lecture session</p>
+            </div>
+            <div class="quick-card" onclick="${state.role === 'ADMIN' ? "navigateTo('ADD_STUDENT')" : "navigateTo('REQUEST_STUDENT')"}">
+              <div class="quick-icon-box" style="background: var(--secondary-container); color: var(--secondary);">
+                <span class="material-symbols-rounded">person_add</span>
+              </div>
+              <h4>${state.role === 'ADMIN' ? 'Add Student' : 'Request Student'}</h4>
+              <p>${state.role === 'ADMIN' ? 'Direct SQLite insert' : 'Submit for Admin approval'}</p>
+            </div>
+            <div class="quick-card" onclick="navigateTo('STUDENTS')">
+              <div class="quick-icon-box" style="background: var(--surface-high); color: var(--primary);">
+                <span class="material-symbols-rounded">groups</span>
+              </div>
+              <h4>Directory</h4>
+              <p>${state.students.length} Pupils across batches</p>
+            </div>
+            <div class="quick-card" onclick="navigateTo('REQUESTS')">
+              <div class="quick-icon-box" style="background: var(--surface-variant); color: var(--primary);">
+                <span class="material-symbols-rounded">fact_check</span>
+              </div>
+              <h4>Approval Center</h4>
+              <p>${pendingRequests.length} Pending items</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shortage Risk Radar with Direct Call Buttons -->
+        <div>
+          <div class="section-title">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="material-symbols-rounded" style="color: var(--absent-red); font-size: 18px;">warning</span>
+              <span>Shortage Risk Alert (<${state.mandatoryThreshold}%)</span>
+            </div>
+            <span style="font-size: 12px; color: var(--primary); cursor: pointer; font-weight: 700;" onclick="navigateTo('STUDENTS')">View (${shortageStudents.length})</span>
+          </div>
+
+          ${shortageStudents.map(st => `
+            <div class="risk-item">
+              <div style="display: flex; align-items: center; gap: 10px;" onclick="navigateTo('STUDENT_DETAIL', ${st.student.id})">
+                <div class="student-avatar" style="background: var(--absent-bg); color: var(--absent-text); width: 38px; height: 38px; font-size: 13px;">${st.student.avatarInitials}</div>
+                <div>
+                  <div style="font-size: 13px; font-weight: 700; color: var(--on-surface);">${st.student.name}</div>
+                  <div style="font-size: 11px; color: var(--on-surface-variant);">${st.student.rollNumber} • ${st.student.section}</div>
+                </div>
+              </div>
+              
+              <!-- Direct Call Actions -->
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <button class="btn btn-sm btn-secondary" onclick="triggerCall('${st.student.phone}', '${st.student.name}')" title="Call Student">
+                  <span class="material-symbols-rounded" style="font-size: 14px;">call</span>
+                </button>
+                <button class="btn btn-sm btn-teal" onclick="triggerCall('${st.student.parentPhone}', '${st.student.name} (Parent: ${st.student.parentName})')" title="Call Parent">
+                  <span class="material-symbols-rounded" style="font-size: 14px;">contact_phone</span>
+                </button>
+                <div style="font-size: 14px; font-weight: 800; color: var(--absent-red); min-width: 38px; text-align: right;">${Math.round(st.percentage)}%</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // 2. STUDENTS ROSTER SCREEN
+    function renderStudentsRoster(container) {
+      const allStats = getAllStudentsWithStats();
+      let filtered = allStats.filter(st => {
+        const matchesQuery = st.student.name.toLowerCase().includes(state.searchQuery.toLowerCase()) ||
+                             st.student.rollNumber.toLowerCase().includes(state.searchQuery.toLowerCase());
+        if (!matchesQuery) return false;
+        if (state.filterTab === 'Low < 75%') return st.percentage !== null && st.percentage < state.mandatoryThreshold;
+        if (state.filterTab === 'Good >= 75%') return st.percentage !== null && st.percentage >= state.mandatoryThreshold;
+        if (state.filterTab === 'Section A') return st.student.section.includes('Section A');
+        if (state.filterTab === 'Section B') return st.student.section.includes('Section B');
+        return true;
+      });
+
+      container.innerHTML = `
+        <!-- Search Box -->
+        <div class="search-box">
+          <span class="material-symbols-rounded" style="color: var(--outline); font-size: 20px;">search</span>
+          <input type="text" placeholder="Search by student name or roll number..." value="${state.searchQuery}" oninput="updateSearch(this.value)" />
+          ${state.searchQuery ? `<span class="material-symbols-rounded" style="cursor: pointer; font-size: 18px; color: var(--outline);" onclick="updateSearch('')">close</span>` : ''}
+        </div>
+
+        <!-- Filter Chips -->
+        <div class="filter-chips">
+          ${['All', 'Low < 75%', 'Good >= 75%', 'Section A', 'Section B'].map(tab => `
+            <div class="chip ${state.filterTab === tab ? 'active' : ''}" onclick="setFilterTab('${tab}')">${tab}</div>
+          `).join('')}
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: var(--on-surface-variant); font-weight: 600;">
+          <span>Showing ${filtered.length} of ${state.students.length} Students</span>
+          <span style="color: var(--primary); font-weight: 700; cursor: pointer;" onclick="${state.role === 'ADMIN' ? "navigateTo('ADD_STUDENT')" : "navigateTo('REQUEST_STUDENT')"}">
+            ${state.role === 'ADMIN' ? '+ Direct Register' : '+ Request Student'}
+          </span>
+        </div>
+
+        <!-- Student Cards List -->
+        <div>
+          ${filtered.map(st => {
+            const badgeClass = st.tier === 'EXCELLENT' ? 'badge-excellent' : (st.tier === 'GOOD' ? 'badge-good' : (st.tier === 'WARNING' ? 'badge-warning' : (st.tier === 'CRITICAL' ? 'badge-critical' : 'badge-special')));
+            const displayPct = st.percentage !== null ? `${Math.round(st.percentage)}%` : 'No Records';
+            return `
+              <div class="student-card" onclick="navigateTo('STUDENT_DETAIL', ${st.student.id})">
+                <div class="student-info">
+                  <div class="student-avatar">${st.student.avatarInitials}</div>
+                  <div class="student-meta">
+                    <h4>${st.student.name}</h4>
+                    <p>${st.student.rollNumber} • ${st.student.section}</p>
+                    <p style="font-size: 10px; color: var(--outline);">${st.attended} / ${st.total} attended • ${st.student.parentName}</p>
+                  </div>
+                </div>
+                <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; gap: 4px;">
+                  <span style="font-size: 15px; font-weight: 800; color: ${st.percentage !== null && st.percentage < state.mandatoryThreshold ? 'var(--absent-red)' : 'var(--on-surface)'};">${displayPct}</span>
+                  <span class="badge ${badgeClass}">${st.tier === 'NO_RECORDS' ? 'New Student' : st.tier}</span>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function updateSearch(val) {
+      state.searchQuery = val;
+      renderStudentsRoster(document.getElementById('screen-content'));
+    }
+    function setFilterTab(tab) {
+      state.filterTab = tab;
+      renderStudentsRoster(document.getElementById('screen-content'));
+    }
+
+    // 3. STUDENT DETAIL SCREEN with Call Student & Call Parent
+    function renderStudentDetail(container) {
+      const stats = getStudentStats(state.selectedStudentId);
+      if (!stats) {
+        navigateTo('STUDENTS');
+        return;
+      }
+      const st = stats.student;
+      const studentRecords = state.records.filter(r => r.studentId === st.id).sort((a,b) => b.date.localeCompare(a.date));
+      const hasRecords = stats.total > 0;
+
+      container.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px;">
+          <button class="btn btn-sm btn-secondary" onclick="navigateTo('STUDENTS')">
+            <span class="material-symbols-rounded">arrow_back</span>
+            <span>Roster</span>
+          </button>
+          ${state.role === 'ADMIN' ? `
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-sm btn-secondary" onclick="openSpecialCaseModal(${st.id})">
+                <span class="material-symbols-rounded" style="font-size: 14px;">star</span>
+                <span>Special Case (OD)</span>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="confirmDeleteStudent(${st.id}, '${st.name}')">
+                <span class="material-symbols-rounded" style="font-size: 14px;">delete</span>
+              </button>
+            </div>
+          ` : `
+            <button class="btn btn-sm btn-secondary" onclick="openCorrectionModal(${st.id}, '${st.name}', '${st.rollNumber}')">
+              <span class="material-symbols-rounded" style="font-size: 14px;">edit_note</span>
+              <span>Request Correction</span>
+            </button>
+          `}
+        </div>
+
+        <!-- Student Profile Card -->
+        <div class="card" style="box-shadow: var(--shadow-md);">
+          <div style="display: flex; gap: 12px; align-items: center;">
+            <div class="student-avatar" style="width: 52px; height: 52px; font-size: 18px;">${st.avatarInitials}</div>
+            <div>
+              <h3 style="font-size: 17px; font-weight: 800; color: var(--on-surface);">${st.name}</h3>
+              <p style="font-size: 12px; color: var(--on-surface-variant); font-weight: 600;">${st.rollNumber} • ${st.section}</p>
+              <p style="font-size: 11px; color: var(--outline);">${st.department}</p>
+            </div>
+          </div>
+
+          <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--surface-container); display: flex; justify-content: space-around; text-align: center;">
+            <div>
+              <div style="font-size: 19px; font-weight: 800; color: ${stats.percentage !== null && stats.percentage < state.mandatoryThreshold ? 'var(--absent-red)' : 'var(--primary)'};">
+                ${stats.percentage !== null ? `${Math.round(stats.percentage)}%` : 'N/A'}
+              </div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--on-surface-variant);">Attendance</div>
+            </div>
+            <div style="border-left: 1px solid var(--surface-container);"></div>
+            <div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--present-green);">${stats.attended}</div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--on-surface-variant);">Attended</div>
+            </div>
+            <div style="border-left: 1px solid var(--surface-container);"></div>
+            <div>
+              <div style="font-size: 19px; font-weight: 800; color: var(--secondary);">${stats.specialCount}</div>
+              <div style="font-size: 10px; font-weight: 700; color: var(--on-surface-variant);">OD / Medical</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Direct Call Student & Call Parent Section -->
+        <div class="card">
+          <div class="section-title">Direct Calling & Guardian Alerts</div>
+          <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+            <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="triggerCall('${st.phone}', '${st.name}')">
+              <span class="material-symbols-rounded">call</span>
+              <span>Call Student</span>
+            </button>
+            <button class="btn btn-teal btn-sm" style="flex: 1;" onclick="triggerCall('${st.parentPhone}', '${st.name} (Parent: ${st.parentName})')">
+              <span class="material-symbols-rounded">contact_phone</span>
+              <span>Call Parent</span>
+            </button>
+          </div>
+          <button class="btn btn-outline btn-sm" style="width: 100%;" onclick="showToast('SMS Attendance update dispatched to ${st.parentName} (${st.parentPhone})')">
+            <span class="material-symbols-rounded" style="color: var(--primary);">send</span>
+            <span>Dispatch SMS Notice to Parent (${st.parentPhone})</span>
+          </button>
+        </div>
+
+        <!-- Attendance Audit Log -->
+        <div>
+          <div class="section-title">Historic Roll Sessions (${studentRecords.length})</div>
+          ${studentRecords.length === 0 ? `
+            <div class="card" style="text-align: center; color: var(--on-surface-variant); font-size: 12px; padding: 20px;">
+              No attendance records recorded yet for this student.
+            </div>
+          ` : studentRecords.map(r => `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-card); padding: 10px 12px; border-radius: 12px; margin-bottom: 6px; border: 1px solid var(--surface-container);">
+              <div>
+                <div style="font-size: 12px; font-weight: 700; color: var(--on-surface);">${r.date} • ${r.subject}</div>
+                <div style="font-size: 10px; color: var(--on-surface-variant);">${r.note || 'Regular Session'}</div>
+              </div>
+              <div style="display: flex; gap: 4px; align-items: center;">
+                ${r.type !== 'REGULAR' ? `<span class="badge badge-special" style="font-size: 9px; padding: 2px 6px;">${r.type}</span>` : ''}
+                <span class="badge ${r.status === 'PRESENT' ? 'badge-excellent' : 'badge-critical'}">${r.status}</span>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    // 4. REQUESTS APPROVAL SCREEN (ADMIN & TEACHER)
+    function renderRequestsScreen(container) {
+      const requests = state.requests;
+      const isAdmin = state.role === 'ADMIN';
+
+      container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div class="section-title" style="margin-bottom: 2px;">${isAdmin ? 'Admin Approval Center' : 'Teacher Request Center'}</div>
+            <div class="section-subtitle">${isAdmin ? 'Approve student registrations and attendance corrections' : 'Track your submitted requests'}</div>
+          </div>
+          ${!isAdmin ? `
+            <div style="display: flex; gap: 6px;">
+              <button class="btn btn-secondary btn-sm" onclick="navigateTo('REQUEST_STUDENT')" title="Register new student">
+                <span class="material-symbols-rounded" style="font-size: 16px;">person_add</span>
+                <span>Register</span>
+              </button>
+              <button class="btn btn-primary btn-sm" onclick="navigateTo('SPECIAL_ATTENDANCE_REQUEST')" title="OD / Medical / Special attendance">
+                <span class="material-symbols-rounded" style="font-size: 16px;">verified</span>
+                <span>Special</span>
+              </button>
+            </div>
+          ` : ''}
+        </div>
+
+        <div>
+          ${requests.map(req => {
+            const isPending = req.status === 'PENDING';
+            return `
+              <div class="card" style="margin-bottom: 10px; box-shadow: var(--shadow-sm);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                  <span class="badge ${req.type === 'ADD_STUDENT' ? 'badge-good' : (req.type === 'SPECIAL_ATTENDANCE' ? 'badge-special' : 'badge-pending')}">
+                    ${req.type === 'ADD_STUDENT' ? 'Student Registration' : (req.type === 'SPECIAL_ATTENDANCE' ? `Special Attendance (${req.category || 'OD'})` : 'Attendance Correction')}
+                  </span>
+                  <span class="badge ${req.status === 'APPROVED' ? 'badge-excellent' : (req.status === 'REJECTED' ? 'badge-critical' : 'badge-pending')}">
+                    ${req.status}
+                  </span>
+                </div>
+
+                <div style="font-size: 13px; font-weight: 800; color: var(--on-surface);">${req.studentName} (${req.studentRollNumber})</div>
+                <div style="font-size: 11px; color: var(--on-surface-variant); margin-top: 2px;">Submitted by: <b>${req.submittedBy}</b></div>
+                <div style="font-size: 12px; color: var(--on-surface); background: var(--surface-low); padding: 8px 10px; border-radius: 8px; margin-top: 6px;">
+                  Reason: ${req.reason}
+                </div>
+
+                ${isAdmin && isPending ? `
+                  <div style="display: flex; gap: 8px; margin-top: 10px;">
+                    <button class="btn btn-danger btn-sm" style="flex: 1;" onclick="rejectRequest(${req.id})">
+                      <span class="material-symbols-rounded">close</span>
+                      <span>Reject</span>
+                    </button>
+                    <button class="btn btn-primary btn-sm" style="flex: 1;" onclick="approveRequest(${req.id})">
+                      <span class="material-symbols-rounded">check</span>
+                      <span>Approve</span>
+                    </button>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    }
+
+    function approveRequest(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req) return;
+      req.status = 'APPROVED';
+
+      if (req.type === 'ADD_STUDENT') {
+        const newStudent = {
+          id: Date.now(),
+          name: req.studentName,
+          rollNumber: req.studentRollNumber,
+          department: req.department,
+          year: req.year,
+          section: req.section,
+          email: req.email,
+          phone: req.phone,
+          parentName: req.parentName || "Guardian",
+          parentPhone: req.parentPhone || "+91 98000 11122",
+          avatarInitials: req.studentName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+        };
+        state.students.push(newStudent);
+      } else if (req.type === 'ATTENDANCE_CORRECTION' && req.studentId) {
+        state.records.push({
+          id: Date.now(),
+          studentId: req.studentId,
+          date: req.date,
+          status: req.requestedStatus || "PRESENT",
+          type: req.requestedType || "REGULAR",
+          subject: req.subject,
+          period: "Period 2 (10:15 AM - 11:15 AM)",
+          note: `Approved correction: ${req.reason}`,
+          createdBy: "Admin"
+        });
+      } else if (req.type === 'SPECIAL_ATTENDANCE' && req.studentId) {
+        state.records.push({
+          id: Date.now(),
+          studentId: req.studentId,
+          date: req.date,
+          status: "PRESENT",
+          type: req.category || "OD",
+          subject: req.subject || "CS502 - Database Systems",
+          period: "Period 2 (10:15 AM - 11:15 AM)",
+          note: `Approved Special (${req.category || 'OD'}): ${req.reason}`,
+          createdBy: "Admin"
+        });
+      }
+
+      state.notifications.unshift({
+        id: Date.now(),
+        title: "Request Approved",
+        message: `Request for ${req.studentName} (${req.studentRollNumber}) was approved by Administrator.`,
+        category: "REQUESTS",
+        isRead: false
+      });
+
+      saveState();
+      showToast(`Request #${id} approved successfully`);
+      renderRequestsScreen(document.getElementById('screen-content'));
+    }
+
+    function rejectRequest(id) {
+      const req = state.requests.find(r => r.id === id);
+      if (!req) return;
+      req.status = 'REJECTED';
+      saveState();
+      showToast(`Request #${id} rejected`);
+      renderRequestsScreen(document.getElementById('screen-content'));
+    }
+
+    // 5. NOTIFICATIONS SCREEN
+    function renderNotificationsScreen(container) {
+      container.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div class="section-title" style="margin-bottom: 0;">Notification Center</div>
+          <button class="btn btn-sm btn-secondary" onclick="markAllNotificationsRead()">Mark all read</button>
+        </div>
+
+        <div>
+          ${state.notifications.map(n => `
+            <div class="card" style="margin-bottom: 8px; background: ${n.isRead ? 'var(--surface-card)' : 'var(--surface-low)'};" onclick="handleNotificationClick(${n.id}, '${n.targetScreen || ''}')">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div style="font-size: 13px; font-weight: ${n.isRead ? '600' : '800'}; color: var(--on-surface);">${n.title}</div>
+                ${!n.isRead ? `<span class="pulse-dot" style="background: var(--primary);"></span>` : ''}
+              </div>
+              <p style="font-size: 11px; color: var(--on-surface-variant); margin-top: 4px;">${n.message}</p>
+            </div>
+          `).join('')}
+        </div>
+      `;
+    }
+
+    function handleNotificationClick(id, target) {
+      const notif = state.notifications.find(n => n.id === id);
+      if (notif) notif.isRead = true;
+      saveState();
+      if (target) navigateTo(target);
+      else renderNotificationsScreen(document.getElementById('screen-content'));
+    }
+
+    function markAllNotificationsRead() {
+      state.notifications.forEach(n => n.isRead = true);
+      saveState();
+      showToast('All notifications marked as read');
+      renderNotificationsScreen(document.getElementById('screen-content'));
+    }
+
+    // Direct Calling Simulator
+    function triggerCall(phoneNumber, name) {
+      showModal(`
+        <div style="text-align: center;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: var(--present-bg); color: var(--present-text); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+            <span class="material-symbols-rounded" style="font-size: 26px;">call</span>
+          </div>
+          <h3 style="font-size: 16px; font-weight: 800; color: var(--on-surface);">Direct Phone Call</h3>
+          <p style="font-size: 12px; color: var(--on-surface-variant); margin-top: 4px;">
+            Dialing <b>${name}</b> at <b>${phoneNumber}</b>
+          </p>
+          <div style="display: flex; gap: 8px; margin-top: 16px;">
+            <button class="btn btn-secondary btn-sm" style="flex: 1;" onclick="hideModal()">End Call</button>
+            <a href="tel:${phoneNumber}" class="btn btn-primary btn-sm" style="flex: 1;" onclick="hideModal()">Open Phone Dialer</a>
+          </div>
+        </div>
+      `);
+    }
+
+    // Special Case Modal (Admin Only)
+    function openSpecialCaseModal(studentId) {
+      const student = state.students.find(s => s.id === studentId);
+      showModal(`
+        <h3 style="font-size: 16px; font-weight: 800; color: var(--primary);">Special Attendance Override</h3>
+        <p style="font-size: 12px; color: var(--on-surface-variant);">Record approved official duty / leave for <b>${student.name}</b></p>
+        
+        <div class="form-group" style="margin-top: 8px;">
+          <label>Special Case Category</label>
+          <select class="form-control" id="modal-special-type">
+            <option value="OD">OD - On Duty (Hackathon/Event)</option>
+            <option value="MEDICAL">Medical Leave (Approved Certificate)</option>
+            <option value="SPORTS">Sports Championship</option>
+            <option value="EXAM">University Competitive Exam</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Lecture Date</label>
+          <input type="date" class="form-control" id="modal-special-date" value="${state.selectedDate}" />
+        </div>
+
+        <div class="form-group">
+          <label>Official Remarks</label>
+          <input type="text" class="form-control" id="modal-special-remarks" placeholder="Approved by HOD" />
+        </div>
+
+        <div style="display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px;">
+          <button class="btn btn-secondary btn-sm" onclick="hideModal()">Cancel</button>
+          <button class="btn btn-primary btn-sm" onclick="saveSpecialCase(${studentId})">Save Special Attendance</button>
+        </div>
+      `);
+    }
+
+    function saveSpecialCase(studentId) {
+      const type = document.getElementById('modal-special-type').value;
+      const date = document.getElementById('modal-special-date').value;
+      const remarks = document.getElementById('modal-special-remarks').value;
+
+      state.records.push({
+        id: Date.now(),
+        studentId: studentId,
+        date: date,
+        status: "PRESENT",
+        type: type,
+        subject: state.selectedSubject,
+        period: "Period 2 (10:15 AM - 11:15 AM)",
+        note: `Approved Special Case (${type})`,
+        remarks: remarks || "Approved by Administrator",
+        createdBy: "Administrator"
+      });
+
+      hideModal();
+      saveState();
+      showToast(`Special case (${type}) saved to Room database`);
+      navigateTo('STUDENT_DETAIL', studentId);
+    }
+
+    // Teacher Request Student Form
+    
+    // --- SPECIAL ATTENDANCE REQUEST SCREEN (Faculty OD / Medical) ---
+    let selectedSpecialCategory = 'OD';
+
+    function renderSpecialAttendanceRequest(container) {
+      const todayStr = new Date().toISOString().split('T')[0];
+      container.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+          <button class="btn btn-sm btn-secondary" onclick="navigateTo('REQUESTS')">
+            <span class="material-symbols-rounded">arrow_back</span>
+            <span>Back</span>
+          </button>
+          <div>
+            <div style="font-size: 15px; font-weight: 800; color: var(--on-surface);">Special Attendance Request</div>
+            <div style="font-size: 11px; color: var(--on-surface-variant);">Faculty On-Duty & Medical Exemption</div>
+          </div>
+        </div>
+
+        <div class="card" style="background: var(--surface-low); border-left: 4px solid var(--primary); margin-bottom: 12px; box-shadow: var(--shadow-sm);">
+          <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; color: var(--primary);">
+            <span class="material-symbols-rounded" style="font-size: 16px;">verified_user</span>
+            <span>Institutional Exemption Workflow</span>
+          </div>
+          <p style="font-size: 11px; color: var(--on-surface-variant); margin-top: 4px; line-height: 1.4;">
+            Special attendance requests require physical or verified documentary evidence (OD letter, hospital prescription, competition badge) and administrator endorsement.
+          </p>
+        </div>
+
+        <form class="card" onsubmit="handleSpecialAttendanceSubmit(event)" style="box-shadow: var(--shadow-md); display: flex; flex-direction: column; gap: 12px;">
+          <div class="form-group">
+            <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; display: block;">Select Student *</label>
+            <select class="form-control" id="special-student-select" required style="width: 100%; font-weight: 600;">
+              ${state.students.map(s => `<option value="${s.id}">${s.name} (${s.rollNumber}) • ${s.section}</option>`).join('')}
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div class="form-group">
+              <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; display: block;">Event Date *</label>
+              <input type="date" class="form-control" id="special-date" value="${todayStr}" required style="width: 100%;" />
+            </div>
+            <div class="form-group">
+              <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; display: block;">Subject / Course *</label>
+              <select class="form-control" id="special-subject" required style="width: 100%;">
+                <option value="CS502 - Database Systems">CS502 - Database Systems</option>
+                <option value="CS504 - Software Engineering">CS504 - Software Engineering</option>
+                <option value="CS601 - Operating Systems">CS601 - Operating Systems</option>
+                <option value="CS603 - Computer Networks">CS603 - Computer Networks</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; display: block;">Special Attendance Category *</label>
+            <div class="category-chips-grid">
+              <button type="button" class="category-chip-btn ${selectedSpecialCategory === 'OD' ? 'selected' : ''}" onclick="selectSpecialCategory('OD')">🏛️ On Duty (OD)</button>
+              <button type="button" class="category-chip-btn ${selectedSpecialCategory === 'MEDICAL' ? 'selected' : ''}" onclick="selectSpecialCategory('MEDICAL')">🏥 Medical</button>
+              <button type="button" class="category-chip-btn ${selectedSpecialCategory === 'SPORTS' ? 'selected' : ''}" onclick="selectSpecialCategory('SPORTS')">🏆 Sports Event</button>
+              <button type="button" class="category-chip-btn ${selectedSpecialCategory === 'EXAM' ? 'selected' : ''}" onclick="selectSpecialCategory('EXAM')">📝 Univ. Exam</button>
+              <button type="button" class="category-chip-btn ${selectedSpecialCategory === 'LEAVE' ? 'selected' : ''}" onclick="selectSpecialCategory('LEAVE')">✈️ Formal Leave</button>
+              <button type="button" class="category-chip-btn ${selectedSpecialCategory === 'OTHER' ? 'selected' : ''}" onclick="selectSpecialCategory('OTHER')">📌 Other</button>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant); margin-bottom: 4px; display: block;">Justification & Document Remarks *</label>
+            <textarea class="form-control" id="special-reason" rows="3" placeholder="e.g. Participated in Inter-College Smart India Hackathon finals. Signed certificate attached with HOD approval." required style="width: 100%; font-family: inherit; font-size: 12px;"></textarea>
+          </div>
+
+          <!-- Mandatory Verification Checkbox -->
+          <div style="background: var(--surface-low); border: 1.5px dashed var(--outline-variant); border-radius: 12px; padding: 12px; margin-top: 4px;">
+            <label style="display: flex; align-items: flex-start; gap: 10px; cursor: pointer;">
+              <input type="checkbox" id="special-verify-checkbox" onchange="toggleSpecialSubmitBtn()" style="margin-top: 2px; width: 18px; height: 18px; accent-color: var(--primary); cursor: pointer;" />
+              <div style="font-size: 12px; font-weight: 700; color: var(--on-surface); line-height: 1.4;">
+                I have verified the supporting documents and official duty records for this student.
+                <div style="font-size: 10px; font-weight: 500; color: var(--on-surface-variant); margin-top: 2px;">
+                  Submission is locked until physical/digital evidence has been reviewed.
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <button type="submit" class="btn btn-primary" id="btn-submit-special" disabled style="width: 100%; height: 46px; font-weight: 800; margin-top: 4px; opacity: 0.6; cursor: not-allowed;">
+            <span class="material-symbols-rounded">send</span>
+            <span>Submit Special Request</span>
+          </button>
+        </form>
+      `;
+    }
+
+    function selectSpecialCategory(cat) {
+      selectedSpecialCategory = cat;
+      const buttons = document.querySelectorAll('.category-chip-btn');
+      buttons.forEach(btn => {
+        btn.classList.toggle('selected', btn.innerText.includes(cat) || (cat === 'LEAVE' && btn.innerText.includes('Leave')) || (cat === 'SPORTS' && btn.innerText.includes('Sports')) || (cat === 'EXAM' && btn.innerText.includes('Exam')));
+      });
+    }
+
+    function toggleSpecialSubmitBtn() {
+      const chk = document.getElementById('special-verify-checkbox');
+      const btn = document.getElementById('btn-submit-special');
+      if (chk && btn) {
+        btn.disabled = !chk.checked;
+        btn.style.opacity = chk.checked ? '1' : '0.6';
+        btn.style.cursor = chk.checked ? 'pointer' : 'not-allowed';
+      }
+    }
+
+    function handleSpecialAttendanceSubmit(e) {
+      e.preventDefault();
+      const studentId = parseInt(document.getElementById('special-student-select').value);
+      const student = state.students.find(s => s.id === studentId);
+      const date = document.getElementById('special-date').value;
+      const subject = document.getElementById('special-subject').value;
+      const reason = document.getElementById('special-reason').value.trim();
+      const chk = document.getElementById('special-verify-checkbox');
+
+      if (!chk || !chk.checked) {
+        showToast('You must confirm document verification before submitting.', true);
+        return;
+      }
+
+      state.requests.unshift({
+        id: Date.now(),
+        type: "SPECIAL_ATTENDANCE",
+        submittedBy: state.currentUserName,
+        studentId: student.id,
+        studentName: student.name,
+        studentRollNumber: student.rollNumber,
+        department: student.department,
+        subject: subject,
+        category: selectedSpecialCategory,
+        requestedStatus: "PRESENT",
+        requestedType: selectedSpecialCategory,
+        reason: `[${selectedSpecialCategory}] ${reason}`,
+        status: "PENDING",
+        date: date
+      });
+
+      state.notifications.unshift({
+        id: Date.now(),
+        title: "Special Attendance Request",
+        message: `${state.currentUserName} submitted ${selectedSpecialCategory} request for ${student.name} (${student.rollNumber}).`,
+        category: "REQUESTS",
+        isRead: false
+      });
+
+      saveState();
+      showToast(`Special attendance request (${selectedSpecialCategory}) submitted to Admin`);
+      navigateTo('REQUESTS');
+    }
+
+    function renderRequestStudent(container) {
+      container.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <button class="btn btn-sm btn-secondary" onclick="navigateTo('STUDENTS')">
+            <span class="material-symbols-rounded">arrow_back</span>
+            <span>Back</span>
+          </button>
+          <span style="font-size: 14px; font-weight: 700; color: var(--on-surface);">Submit Student Request</span>
+        </div>
+
+        <div class="card" style="background: var(--surface-low); border-left: 4px solid var(--secondary); margin-bottom: 10px;">
+          <div style="font-size: 12px; font-weight: 700; color: var(--secondary);">Teacher Workflow Notice</div>
+          <p style="font-size: 11px; color: var(--on-surface-variant); margin-top: 2px;">
+            Submitted student details will be forwarded to the Administrator's approval queue before appearing in the official roster.
+          </p>
+        </div>
+
+        <form class="card" onsubmit="handleRequestStudentSubmit(event)">
+          <div class="form-group">
+            <label>Student Full Legal Name *</label>
+            <input type="text" class="form-control" id="req-name" required />
+          </div>
+          <div class="form-group">
+            <label>Roll / University ID *</label>
+            <input type="text" class="form-control" id="req-roll" required />
+          </div>
+          <div class="form-group">
+            <label>Parent / Guardian Name</label>
+            <input type="text" class="form-control" id="req-parent-name" placeholder="Mr. / Mrs." required />
+          </div>
+          <div class="form-group">
+            <label>Guardian Phone Number</label>
+            <input type="tel" class="form-control" id="req-parent-phone" placeholder="+91 98000 00000" required />
+          </div>
+          <div class="form-group">
+            <label>Reason for Late Registration</label>
+            <input type="text" class="form-control" id="req-reason" placeholder="e.g. Admitted in lateral counseling" required />
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+            <span class="material-symbols-rounded">send</span>
+            <span>Submit Registration Request</span>
+          </button>
+        </form>
+      `;
+    }
+
+    function handleRequestStudentSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('req-name').value.trim();
+      const rollNumber = document.getElementById('req-roll').value.trim().toUpperCase();
+      const parentName = document.getElementById('req-parent-name').value.trim();
+      const parentPhone = document.getElementById('req-parent-phone').value.trim();
+      const reason = document.getElementById('req-reason').value.trim();
+
+      state.requests.unshift({
+        id: Date.now(),
+        type: "ADD_STUDENT",
+        submittedBy: state.currentUserName,
+        studentName: name,
+        studentRollNumber: rollNumber,
+        department: "Computer Science & Engineering",
+        year: "III Year",
+        section: "Section A",
+        email: `${name.toLowerCase().replace(' ', '.')}@college.edu`,
+        phone: "+91 98765 00000",
+        parentName: parentName,
+        parentPhone: parentPhone,
+        reason: reason,
+        status: "PENDING",
+        date: state.selectedDate
+      });
+
+      state.notifications.unshift({
+        id: Date.now(),
+        title: "New Student Registration Request",
+        message: `${state.currentUserName} submitted request for ${name} (${rollNumber}).`,
+        category: "REQUESTS",
+        isRead: false
+      });
+
+      saveState();
+      showToast('Student registration request submitted to Admin');
+      navigateTo('REQUESTS');
+    }
+
+    // Direct Add Student (Admin Only)
+    function renderAddStudent(container) {
+      container.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+          <button class="btn btn-sm btn-secondary" onclick="navigateTo('STUDENTS')">
+            <span class="material-symbols-rounded">arrow_back</span>
+            <span>Back</span>
+          </button>
+          <span style="font-size: 14px; font-weight: 700; color: var(--on-surface);">Direct Student Registration</span>
+        </div>
+
+        <form class="card" onsubmit="handleAddStudentSubmit(event)">
+          <div class="form-group">
+            <label>Student Full Name *</label>
+            <input type="text" class="form-control" id="add-name" required />
+          </div>
+          <div class="form-group">
+            <label>Roll Number *</label>
+            <input type="text" class="form-control" id="add-roll" required />
+          </div>
+          <div class="form-group">
+            <label>Student Phone</label>
+            <input type="tel" class="form-control" id="add-phone" placeholder="+91 98765 00000" />
+          </div>
+          <div class="form-group">
+            <label>Parent / Guardian Name</label>
+            <input type="text" class="form-control" id="add-parent-name" placeholder="Guardian Name" />
+          </div>
+          <div class="form-group">
+            <label>Parent Phone Number</label>
+            <input type="tel" class="form-control" id="add-parent-phone" placeholder="+91 98111 00000" />
+          </div>
+
+          <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+            <span class="material-symbols-rounded">save</span>
+            <span>Add Student to Room DB</span>
+          </button>
+        </form>
+      `;
+    }
+
+    function handleAddStudentSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('add-name').value.trim();
+      const rollNumber = document.getElementById('add-roll').value.trim().toUpperCase();
+      const phone = document.getElementById('add-phone').value.trim() || "+91 98765 00000";
+      const parentName = document.getElementById('add-parent-name').value.trim() || "Guardian";
+      const parentPhone = document.getElementById('add-parent-phone').value.trim() || "+91 98111 00000";
+
+      const newStudent = {
+        id: Date.now(),
+        name,
+        rollNumber,
+        department: "Computer Science & Engineering",
+        year: "III Year",
+        section: "Section A",
+        email: `${name.toLowerCase().replace(' ', '.')}@college.edu`,
+        phone,
+        parentName,
+        parentPhone,
+        avatarInitials: name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
+      };
+
+      state.students.push(newStudent);
+      saveState();
+      showToast(`Student ${name} registered with 0 initial sessions`);
+      navigateTo('STUDENTS');
+    }
+
+    // Mark Attendance Screen
+    function renderMarkAttendance(container) {
+      const draft = state.activeSessionDraft;
+      const total = state.students.length;
+      let presentCount = 0;
+      Object.values(draft).forEach(status => {
+        if (status === 'PRESENT') presentCount++;
+      });
+      const absentCount = total - presentCount;
+      const turnOutPct = total > 0 ? Math.round((presentCount / total) * 100) : 0;
+
+      container.innerHTML = `
+        <div class="card" style="box-shadow: var(--shadow-md);">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <span class="badge" style="background: var(--surface-variant); color: var(--primary); font-weight: 800;">
+              ROLL CALL SESSION
+            </span>
+            <div style="display: flex; gap: 6px; align-items: center;">
+              <button class="btn btn-sm btn-secondary" onclick="shiftDate(-1)"><span class="material-symbols-rounded">chevron_left</span></button>
+              <span style="font-size: 12px; font-weight: 700; color: var(--on-surface);">${state.selectedDate}</span>
+              <button class="btn btn-sm btn-secondary" onclick="shiftDate(1)"><span class="material-symbols-rounded">chevron_right</span></button>
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom: 8px;">
+            <label>Course / Subject</label>
+            <select class="form-control" onchange="state.selectedSubject = this.value">
+              <option ${state.selectedSubject.includes('CS502') ? 'selected' : ''}>CS502 - Database Systems</option>
+              <option ${state.selectedSubject.includes('CS501') ? 'selected' : ''}>CS501 - Operating Systems</option>
+              <option ${state.selectedSubject.includes('CS503') ? 'selected' : ''}>CS503 - Computer Networks</option>
+              <option ${state.selectedSubject.includes('CS504') ? 'selected' : ''}>CS504 - Software Engineering</option>
+            </select>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; background: var(--surface-low); padding: 10px 14px; border-radius: 12px; margin-top: 8px;">
+            <div style="font-size: 12px; font-weight: 700; color: var(--on-surface);">
+              Turnout: <span style="color: var(--primary); font-weight: 800;">${turnOutPct}%</span>
+              <span style="color: var(--on-surface-variant); font-weight: 500;">(${presentCount}P / ${absentCount}A)</span>
+            </div>
+            <button class="btn btn-sm btn-primary" onclick="markAllPresent()">
+              <span class="material-symbols-rounded" style="font-size: 14px;">done_all</span>
+              <span>All Present</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <div class="section-title">Class Roll (${total} Pupils)</div>
+          ${state.students.map(student => {
+            const isPresent = draft[student.id] === 'PRESENT';
+            return `
+              <div class="mark-item">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                  <div class="student-avatar" style="width: 36px; height: 36px; font-size: 12px;">${student.avatarInitials}</div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: var(--on-surface);">${student.name}</div>
+                    <div style="font-size: 10px; color: var(--on-surface-variant);">${student.rollNumber} • ${student.section}</div>
+                  </div>
+                </div>
+
+                <div class="toggle-attendance-group">
+                  <button class="toggle-att-btn present ${isPresent ? 'active' : ''}" onclick="setAttendanceStatus(${student.id}, 'PRESENT')">
+                    <span class="material-symbols-rounded" style="font-size: 13px;">check</span>
+                    <span>P</span>
+                  </button>
+                  <button class="toggle-att-btn absent ${!isPresent ? 'active' : ''}" onclick="setAttendanceStatus(${student.id}, 'ABSENT')">
+                    <span class="material-symbols-rounded" style="font-size: 13px;">close</span>
+                    <span>A</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+
+        <div style="padding-top: 10px; margin-bottom: 20px;">
+          <button class="btn btn-primary" style="width: 100%; padding: 14px;" onclick="saveActiveAttendance()">
+            <span class="material-symbols-rounded">save</span>
+            <span>Save Attendance Session to Room DB</span>
+          </button>
+        </div>
+      `;
+    }
+
+    function shiftDate(offset) {
+      const curr = new Date(state.selectedDate);
+      curr.setDate(curr.getDate() + offset);
+      state.selectedDate = curr.toISOString().split('T')[0];
+      initDraftForDate(state.selectedDate);
+      renderMarkAttendance(document.getElementById('screen-content'));
+    }
+
+    function setAttendanceStatus(studentId, status) {
+      state.activeSessionDraft[studentId] = status;
+      renderMarkAttendance(document.getElementById('screen-content'));
+    }
+
+    function markAllPresent() {
+      state.students.forEach(s => state.activeSessionDraft[s.id] = 'PRESENT');
+      showToast(`Marked all ${state.students.length} students Present`);
+      renderMarkAttendance(document.getElementById('screen-content'));
+    }
+
+    function saveActiveAttendance() {
+      const date = state.selectedDate;
+      const subject = state.selectedSubject;
+      state.records = state.records.filter(r => r.date !== date);
+
+      state.students.forEach(student => {
+        const status = state.activeSessionDraft[student.id] || "PRESENT";
+        state.records.push({
+          id: Date.now() + Math.random(),
+          studentId: student.id,
+          date: date,
+          status: status,
+          type: "REGULAR",
+          subject: subject,
+          period: "Period 2 (10:15 AM - 11:15 AM)",
+          note: status === "ABSENT" ? "Recorded unexcused absence" : "Verified regular roll call",
+          createdBy: state.currentUserName
+        });
+      });
+
+      saveState();
+      showToast(`Saved! Attendance session stored into SQLite`);
+    }
+
+    // Reports Screen
+    function renderReports(container) {
+      const stats = getAllStudentsWithStats().filter(s => s.percentage !== null);
+      const excellentCount = stats.filter(s => s.tier === 'EXCELLENT').length;
+      const goodCount = stats.filter(s => s.tier === 'GOOD').length;
+      const warningCount = stats.filter(s => s.tier === 'WARNING').length;
+      const criticalCount = stats.filter(s => s.tier === 'CRITICAL').length;
+      const total = stats.length || 1;
+
+      container.innerHTML = `
+        <div class="card" style="box-shadow: var(--shadow-md);">
+          <div class="section-title">Cohort Standing Breakdown</div>
+          <div class="section-subtitle" style="margin-bottom: 12px;">Based on Room SQLite attendance logs</div>
+
+          <div style="height: 18px; border-radius: 9px; overflow: hidden; display: flex; margin-bottom: 12px;">
+            <div style="width: ${(excellentCount/total)*100}%; background: var(--present-green);" title="Excellent"></div>
+            <div style="width: ${(goodCount/total)*100}%; background: #0369A1;" title="Good"></div>
+            <div style="width: ${(warningCount/total)*100}%; background: var(--warning-amber);" title="Warning"></div>
+            <div style="width: ${(criticalCount/total)*100}%; background: var(--absent-red);" title="Critical"></div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 11px;">
+            <div>≥90% Excellent: <b>${excellentCount}</b></div>
+            <div>75-89% Good: <b>${goodCount}</b></div>
+            <div>65-74% Warning: <b>${warningCount}</b></div>
+            <div>&lt;65% Critical: <b>${criticalCount}</b></div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="section-title">Shortage Radar Dispatch</div>
+          <p style="font-size: 12px; color: var(--on-surface-variant); margin-bottom: 12px;">
+            Dispatch compliance SMS alert to parents of all <b>${warningCount + criticalCount} students</b> under ${state.mandatoryThreshold}%.
+          </p>
+          <button class="btn btn-primary" style="width: 100%;" onclick="showToast('Dispatched SMS compliance notice to ${warningCount + criticalCount} guardians')">
+            <span class="material-symbols-rounded">send</span>
+            <span>Dispatch Batch SMS Notices</span>
+          </button>
+        </div>
+      `;
+    }
+
+    // Settings Screen (Role-Aware)
+    function renderSettings(container) {
+      const isAdmin = state.role === 'ADMIN';
+      container.innerHTML = `
+        <div class="card">
+          <div class="section-title">Active User Session</div>
+          <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+            <div class="student-avatar" style="width: 46px; height: 46px; font-size: 16px;">${isAdmin ? 'PS' : 'AR'}</div>
+            <div>
+              <div style="font-size: 14px; font-weight: 700; color: var(--on-surface);">${state.currentUserName}</div>
+              <div style="font-size: 12px; color: var(--on-surface-variant);">${state.currentUserEmail}</div>
+              <span class="badge ${isAdmin ? 'badge-good' : 'badge-special'}" style="font-size: 10px; margin-top: 4px;">Role: ${state.role}</span>
+            </div>
+          </div>
+          <button class="btn btn-outline" style="width: 100%; margin-top: 14px; color: var(--absent-red); border: 1.5px solid #FFDAD6; background: #FFF5F5; font-weight: 700;" onclick="showLogoutConfirmModal()">
+            <span class="material-symbols-rounded">logout</span>
+            <span>Sign Out of TrackEdu</span>
+          </button>
+        </div>
+
+        <!-- Appearance Mode Selector (3 Segments) -->
+        <div class="card">
+          <div class="section-title">Theme & Appearance</div>
+          <div style="font-size: 11px; color: var(--on-surface-variant); margin-top: 2px; margin-bottom: 10px;">
+            Choose system default or switch between Stitch White Light and Sleek Dark modes.
+          </div>
+          <div class="theme-segment-bar">
+            <button class="theme-segment-chip ${state.themeMode === 'LIGHT' ? 'active' : ''}" id="settings-theme-light" onclick="setTheme('LIGHT')">
+              <span class="material-symbols-rounded" style="font-size: 16px;">light_mode</span>
+              <span>Light</span>
+            </button>
+            <button class="theme-segment-chip ${state.themeMode === 'DARK' ? 'active' : ''}" id="settings-theme-dark" onclick="setTheme('DARK')">
+              <span class="material-symbols-rounded" style="font-size: 16px;">dark_mode</span>
+              <span>Dark</span>
+            </button>
+            <button class="theme-segment-chip ${state.themeMode === 'SYSTEM' ? 'active' : ''}" id="settings-theme-system" onclick="setTheme('SYSTEM')">
+              <span class="material-symbols-rounded" style="font-size: 16px;">devices</span>
+              <span>System</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Authentication Session & Security Card (5-Minute Absolute Timeout) -->
+        <div class="card" style="border-left: 4px solid var(--secondary);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div class="section-title" style="margin-bottom: 0;">Authentication Session & Security</div>
+            <span class="badge badge-good" style="font-size: 10px;">Active</span>
+          </div>
+          <div style="background: var(--surface-low); border-radius: 12px; padding: 12px; margin-top: 10px; display: flex; align-items: center; justify-content: space-between;">
+            <div>
+              <div style="font-size: 11px; font-weight: 700; color: var(--on-surface-variant);">AUTO-LOGOUT COUNTDOWN</div>
+              <div style="font-size: 10px; color: var(--outline); margin-top: 1px;">Strict 5-minute absolute lifetime</div>
+            </div>
+            <div id="settings-session-countdown" style="font-size: 20px; font-weight: 800; font-family: monospace; color: var(--primary);">
+              04:59
+            </div>
+          </div>
+          <p style="font-size: 11px; color: var(--on-surface-variant); margin-top: 8px; line-height: 1.4;">
+            For statutory student privacy, your session automatically expires after 5 minutes. User activity or navigation does not extend this window.
+          </p>
+          <button class="btn btn-secondary btn-sm" style="width: 100%; margin-top: 10px; font-weight: 700;" onclick="triggerSessionExpiry()">
+            <span class="material-symbols-rounded" style="font-size: 16px;">alarm_off</span>
+            <span>Simulate 5-Min Session Expiry (QA Test)</span>
+          </button>
+        </div>
+
+        ${isAdmin ? `
+          <div class="card">
+            <div class="section-title">Attendance Threshold Regulation</div>
+            <div class="form-group" style="margin-top: 8px;">
+              <div style="display: flex; justify-content: space-between; font-size: 12px; font-weight: 700;">
+                <span>Statutory Mandatory Bar</span>
+                <span>${state.mandatoryThreshold}%</span>
+              </div>
+              <input type="range" min="60" max="85" value="${state.mandatoryThreshold}" style="width: 100%; margin-top: 6px;" oninput="state.mandatoryThreshold = parseInt(this.value); this.previousElementSibling.lastElementChild.innerText = this.value + '%';" />
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-title">Database Administration</div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <button class="btn btn-secondary btn-sm" onclick="showToast('Attendance query cache cleared')">
+                <span class="material-symbols-rounded">cleaning_services</span>
+                <span>Clear Cache</span>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="resetDatabase()">
+                <span class="material-symbols-rounded">restart_alt</span>
+                <span>Format SQLite Database</span>
+              </button>
+            </div>
+          </div>
+        ` : `
+          <div class="card">
+            <div class="section-title">Teacher Permissions</div>
+            <p style="font-size: 12px; color: var(--on-surface-variant);">
+              You are logged in with Teacher permissions. Destructive database operations are restricted to Department Administrators.
+            </p>
+          </div>
+        `}
+      `;
+    }
+
+    function resetDatabase() {
+      localStorage.clear();
+      state.students = [...initialStudents];
+      state.records = generateInitialRecords();
+      state.requests = [...initialRequests];
+      state.notifications = [...initialNotifications];
+      saveState();
+      showToast('Database formatted & restored');
+      renderScreen();
+    }
+
+    // UI Feedback Helpers
+    function showToast(msg, isError = false) {
+      const toast = document.getElementById('toast-snackbar');
+      const text = document.getElementById('toast-text');
+      text.innerText = msg;
+      toast.style.background = isError ? 'var(--absent-red)' : '#1E293B';
+      toast.style.display = 'flex';
+      setTimeout(() => { hideToast(); }, 3500);
+    }
+    function hideToast() {
+      document.getElementById('toast-snackbar').style.display = 'none';
+    }
+    function showModal(contentHtml) {
+      const overlay = document.getElementById('modal-overlay');
+      const box = document.getElementById('modal-box');
+      box.innerHTML = contentHtml;
+      overlay.style.display = 'flex';
+    }
+    function hideModal() {
+      document.getElementById('modal-overlay').style.display = 'none';
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      const hrs = String(now.getHours()).padStart(2, '0');
+      const mins = String(now.getMinutes()).padStart(2, '0');
+      const clockEl = document.getElementById('live-clock');
+      if (clockEl) clockEl.innerText = `${hrs}:${mins}`;
+    }, 1000);
+
+    
+    // --- Appearance & Theme Engine ---
+    function setTheme(mode) {
+      state.themeMode = mode;
+      localStorage.setItem('trackedu_theme_mode', mode);
+
+      let isDark = false;
+      if (mode === 'DARK') isDark = true;
+      else if (mode === 'SYSTEM') isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      else isDark = false;
+
+      document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+      document.body.classList.toggle('dark-mode', isDark);
+
+      ['drawer-theme', 'settings-theme'].forEach(prefix => {
+        const l = document.getElementById(`${prefix}-light`);
+        const d = document.getElementById(`${prefix}-dark`);
+        const s = document.getElementById(`${prefix}-system`);
+        if (l) l.classList.toggle('active', mode === 'LIGHT');
+        if (d) d.classList.toggle('active', mode === 'DARK');
+        if (s) s.classList.toggle('active', mode === 'SYSTEM');
+      });
+
+      showToast(`Appearance: ${mode.charAt(0) + mode.slice(1).toLowerCase()} Mode`);
+    }
+
+    // Initialize Theme
+    const savedTheme = localStorage.getItem('trackedu_theme_mode') || 'LIGHT';
+    if (savedTheme === 'DARK' || (savedTheme === 'SYSTEM' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      document.body.classList.add('dark-mode');
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      document.body.classList.remove('dark-mode');
+    }
+
+    // --- Navigation Drawer Functions ---
+    function openDrawer() {
+      const overlay = document.getElementById('drawer-overlay');
+      const avatar = document.getElementById('drawer-avatar');
+      const name = document.getElementById('drawer-user-name');
+      const email = document.getElementById('drawer-user-email');
+      const roleBadge = document.getElementById('drawer-role-badge');
+      
+      if (avatar) avatar.innerText = state.role === 'ADMIN' ? 'PS' : 'AR';
+      if (name) name.innerText = state.currentUserName;
+      if (email) email.innerText = state.currentUserEmail;
+      if (roleBadge) {
+        roleBadge.innerText = state.role;
+        roleBadge.className = `badge ${state.role === 'ADMIN' ? 'badge-good' : 'badge-special'}`;
+      }
+      
+      if (overlay) overlay.classList.add('open');
+    }
+
+    function closeDrawer() {
+      const overlay = document.getElementById('drawer-overlay');
+      if (overlay) overlay.classList.remove('open');
+    }
+
+    function handleDrawerBackdropClick(e) {
+      if (e.target.id === 'drawer-overlay') {
+        closeDrawer();
+      }
+    }
+
+    function drawerNavigate(screen) {
+      closeDrawer();
+      navigateTo(screen);
+    }
+
+    // --- Absolute 5-Minute Session Expiry Engine ---
+    let sessionRemainingSeconds = 300;
+    let sessionTimerInterval = null;
+
+    function startSessionTimer() {
+      if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+      
+      const session = JSON.parse(localStorage.getItem('trackedu_session'));
+      if (session && session.isLoggedIn) {
+        if (!session.expiryTime) {
+          session.expiryTime = Date.now() + 300 * 1000;
+          localStorage.setItem('trackedu_session', JSON.stringify(session));
+        }
+      }
+
+      sessionTimerInterval = setInterval(() => {
+        if (!state.isLoggedIn) return;
+        const curSession = JSON.parse(localStorage.getItem('trackedu_session'));
+        if (!curSession || !curSession.expiryTime) return;
+
+        const diff = Math.max(0, Math.floor((curSession.expiryTime - Date.now()) / 1000));
+        sessionRemainingSeconds = diff;
+
+        const countdownEl = document.getElementById('settings-session-countdown');
+        if (countdownEl) {
+          const mins = String(Math.floor(sessionRemainingSeconds / 60)).padStart(2, '0');
+          const secs = String(sessionRemainingSeconds % 60).padStart(2, '0');
+          countdownEl.innerText = `${mins}:${secs}`;
+        }
+
+        if (sessionRemainingSeconds <= 0) {
+          triggerSessionExpiry();
+        }
+      }, 1000);
+    }
+
+    function triggerSessionExpiry() {
+      state.isLoggedIn = false;
+      localStorage.removeItem('trackedu_session');
+      showModal(`
+        <div style="text-align: center; padding: 10px 4px;">
+          <div style="width: 52px; height: 52px; border-radius: 50%; background: #FFDAD6; color: var(--absent-red); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px auto;">
+            <span class="material-symbols-rounded" style="font-size: 30px;">timer_off</span>
+          </div>
+          <div style="font-size: 16px; font-weight: 800; color: var(--on-surface); margin-bottom: 6px;">Session Expired</div>
+          <p style="font-size: 12px; color: var(--on-surface-variant); line-height: 1.5; margin-bottom: 16px;">
+            For statutory student privacy and security compliance, your session has timed out after 5 minutes of absolute lifetime.
+          </p>
+          <button class="btn btn-primary" style="width: 100%; height: 44px; font-weight: 800;" onclick="hideModal(); navigateTo('LOGIN');">
+            <span class="material-symbols-rounded">login</span>
+            <span>Return to Sign In</span>
+          </button>
+        </div>
+      `);
+    }
+
+    // Hook session timer to login success
+
+    startSessionTimer();
+    navigateTo('SPLASH');
+  </script>
+</body>
+</html>

@@ -1,0 +1,6 @@
+{
+  "name": "TrackEdu",
+  "description": "Student attendance management application with local Room database, student profiles, attendance marking, percentage tracking, and analytics dashboards.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
